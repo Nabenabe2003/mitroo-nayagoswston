@@ -254,7 +254,7 @@ function rowToStudent(r){
     followUp: r.follow_up||{hasDate:false,date:null,lastReminderAt:null},
     reengage: r.reengage||{lastReminderAt:null},
     enrollingSince:r.enrolling_since, enrollingLastBoardAlertAt:r.enrolling_last_board_alert_at, infoEmailSent:!!r.info_email_sent,
-    registry: r.registry||{pool:null,sea:null},
+    registry: r.registry||{pool:null,sea:null,boat:null},
     payment: r.payment||{totalAmount:null,directorApproved:false,approvedBy:'',planType:'single',installments:[],receiptType:'receipt',afm:'',payments:[]},
     documents: r.documents||{application:false,photos:false,idCopy:false,medicalRequired:4,medicalProvided:0},
     training: r.training||{poolHours:0,seaHours:0,lastAttendanceUpdate:null,lastAttendanceReminderAt:null,performanceApproved:false},
@@ -423,7 +423,7 @@ function newStudent(base){
     followUp:{ hasDate:false, date:null, lastReminderAt:null },
     reengage:{ lastReminderAt:null },
     enrollingSince:null, enrollingLastBoardAlertAt:null, infoEmailSent:false,
-    registry:{ pool:null, sea:null },
+    registry:{ pool:null, sea:null, boat:null },
     payment:{
       totalAmount:null, directorApproved:false, approvedBy:'',
       planType:'single', installments:[],
@@ -438,6 +438,28 @@ function newStudent(base){
 
 function depositMinimum(student){
   return student.payment.directorApproved && student.payment.depositApprovedLower ? state.config.minDepositWithApproval : state.config.minDeposit;
+}
+
+// Default maximum a student should ever owe, based on which registries
+// they're enrolled in here. Ταχύπλοο (boat) is required to get a sea
+// lifeguard certificate from us, but a student may already hold it from
+// another school — in that case they only register for "sea" here and pay
+// the lower, sea-only price. Pool is priced independently of the other two.
+function defaultPaymentCap(student){
+  const r = student.registry||{};
+  let cap = 0;
+  if(r.pool) cap += 350;
+  if(r.sea && r.boat) cap += 800;
+  else if(r.sea) cap += 450;
+  else if(r.boat) cap += 350;
+  return cap;
+}
+// The cap actually enforced: the school-wide default, unless the director
+// has explicitly approved a different total for this student.
+function effectivePaymentCap(student){
+  const p = student.payment;
+  if(p.directorApproved && p.totalAmount!=null) return Number(p.totalAmount);
+  return defaultPaymentCap(student);
 }
 
 function computeAbsencePct(student){
@@ -723,10 +745,18 @@ function updateStudentLocalOnly(id, patch){
 function updateStudent(id, patch, opts){
   const student = getStudent(id);
   if(!student) return Promise.resolve();
+  const snapshot = JSON.parse(JSON.stringify(student));
   applyDotPatch(student, patch);
   render();
   if(!(opts&&opts.silent)) toast('Αποθηκεύτηκε');
-  return Sb.upsertStudent(student).then(saved=>{ Object.assign(student, saved); render(); return saved; });
+  return Sb.upsertStudent(student).then(saved=>{ Object.assign(student, saved); render(); return saved; })
+    .catch(err=>{
+      // The server (RLS or a business-rule trigger, e.g. the payment cap)
+      // rejected this write — don't leave the optimistic, never-actually-saved
+      // change showing on screen. Sb.upsertStudent already toasted the reason.
+      Object.assign(student, snapshot); render();
+      throw err;
+    });
 }
 function addStudent(data){
   const student = newStudent(data);
@@ -878,12 +908,14 @@ function renderRail(){
   if(state.stageFilter!=='all') list = list.filter(s=>s.stage===state.stageFilter);
   if(state.trackFilter==='pool') list = list.filter(s=>s.registry.pool);
   if(state.trackFilter==='sea') list = list.filter(s=>s.registry.sea);
+  if(state.trackFilter==='boat') list = list.filter(s=>s.registry.boat);
   if(q) list = list.filter(s=> (s.name||'').toLowerCase().includes(q) || (s.phone||'').includes(q) || (s.email||'').toLowerCase().includes(q));
   const counts = {};
   STAGES.forEach(s=>counts[s.key]=0);
   state.students.forEach(s=>{ counts[s.stage]=(counts[s.stage]||0)+1; });
   const poolCount = state.students.filter(s=>s.registry.pool).length;
   const seaCount = state.students.filter(s=>s.registry.sea).length;
+  const boatCount = state.students.filter(s=>s.registry.boat).length;
 
   return `
   <div class="rail">
@@ -892,6 +924,7 @@ function renderRail(){
       <button class="chip track-chip ${state.trackFilter==='all'?'active':''}" data-track="all">Όλα τα προγράμματα</button>
       <button class="chip track-chip ${state.trackFilter==='pool'?'active':''}" data-track="pool">Πισίνα <span class="n">${poolCount}</span></button>
       <button class="chip track-chip ${state.trackFilter==='sea'?'active':''}" data-track="sea">Θάλασσα <span class="n">${seaCount}</span></button>
+      <button class="chip track-chip ${state.trackFilter==='boat'?'active':''}" data-track="boat">Ταχύπλοο <span class="n">${boatCount}</span></button>
     </div>
     <div class="chip-row">
       <button class="chip filter-chip ${state.stageFilter==='all'?'active':''}" data-stage="all">Όλοι <span class="n">${state.students.length}</span></button>
@@ -1022,8 +1055,10 @@ function tabRegistry(s){
   const deps = state.departments||[];
   const poolDeps = deps.filter(d=>d.type==='pool');
   const seaDeps = deps.filter(d=>d.type==='sea');
+  const boatDeps = deps.filter(d=>d.type==='boat');
   const poolDupe = s.registry.pool && state.students.some(o=>o.id!==s.id && o.registry.pool && o.registry.pool.number===s.registry.pool.number && s.registry.pool.number);
   const seaDupe = s.registry.sea && state.students.some(o=>o.id!==s.id && o.registry.sea && o.registry.sea.number===s.registry.sea.number && s.registry.sea.number);
+  const boatDupe = s.registry.boat && state.students.some(o=>o.id!==s.id && o.registry.boat && o.registry.boat.number===s.registry.boat.number && s.registry.boat.number);
   return `
   <form id="registryForm" data-id="${s.id}">
     <div class="section-title">Μητρώο πισίνας</div>
@@ -1052,6 +1087,20 @@ function tabRegistry(s){
     </div>
     ${seaDupe? `<p class="hint" style="color:var(--critical);">⚠ Ο αριθμός μητρώου θάλασσας χρησιμοποιείται ήδη από άλλον/η μαθητή/τρια.</p>`:''}
     <p class="hint">Η ένταξη σε μητρώο θάλασσας στέλνει αυτόματα ειδοποίηση στην Ευμορφία για το ταχύπλοο.</p>
+
+    <div class="section-title" style="margin-top:20px;">Μητρώο ταχύπλοου</div>
+    <div class="grid3">
+      <div class="field"><label><input type="checkbox" name="boatEnabled" ${s.registry.boat?'checked':''}> Ένταξη σε τμήμα ταχύπλοου</label></div>
+      <div class="field"><label>Αριθμός μητρώου (όπως στο βιβλίο μητρώου)</label><input name="boatNumber" value="${s.registry.boat?escapeHtml(s.registry.boat.number):''}" ${!s.registry.boat?'disabled':''}></div>
+      <div class="field"><label>Τμήμα</label>
+        <select name="boatDept" ${!s.registry.boat?'disabled':''}>
+          <option value="">—</option>
+          ${boatDeps.map(d=>`<option value="${d.id}" ${s.registry.boat&&s.registry.boat.departmentId===d.id?'selected':''}>${escapeHtml(d.name)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${boatDupe? `<p class="hint" style="color:var(--critical);">⚠ Ο αριθμός μητρώου ταχύπλοου χρησιμοποιείται ήδη από άλλον/η μαθητή/τρια.</p>`:''}
+    <p class="hint">Ανεξάρτητο μητρώο (μπορεί κάποιος να κάνει μόνο ταχύπλοο) — αλλά επηρεάζει το ανώτατο ποσό εξόφλησης μαζί με τη θάλασσα, βλ. καρτέλα Πληρωμή.</p>
     <div class="modal-actions"><button class="btn btn-primary" type="submit">Αποθήκευση</button></div>
   </form>`;
 }
@@ -1060,14 +1109,19 @@ function tabPayment(s){
   const p = s.payment;
   const paidSum = (p.payments||[]).reduce((a,x)=>a+(Number(x.amount)||0),0);
   const remaining = p.totalAmount!=null ? Math.max(0, p.totalAmount - paidSum) : null;
+  const defCap = defaultPaymentCap(s);
+  const cap = effectivePaymentCap(s);
+  const needsApproval = p.totalAmount!=null && Number(p.totalAmount)!==defCap && !p.directorApproved;
   return `
   <form id="paymentForm" data-id="${s.id}">
     <div class="section-title">Ποσό εξόφλησης</div>
+    <p class="hint" style="margin-top:-6px;">Ανώτατο επιτρεπτό ποσό βάσει εγγραφών (πισίνα/θάλασσα/ταχύπλοο): <b>${fmtMoney(defCap)}</b>${defCap===0?' (δεν έχει ενταχθεί ακόμη σε μητρώο — δεν εφαρμόζεται όριο πριν την ένταξη)':''}. Για διαφορετικό ποσό απαιτείται έγκριση διευθυντή παρακάτω.</p>
     <div class="grid3">
-      <div class="field"><label>Συνολικό ποσό (€)</label><input name="totalAmount" type="number" min="0" step="0.01" value="${p.totalAmount??''}"></div>
+      <div class="field"><label>Συνολικό ποσό (€)</label><input name="totalAmount" type="number" min="0" step="0.01" value="${p.totalAmount??''}" placeholder="π.χ. ${defCap||800} (προκαθορισμένο)"></div>
       <div class="field"><label><input type="checkbox" name="directorApproved" ${p.directorApproved?'checked':''}> Εγκρίθηκε από τον Διευθυντή</label></div>
       <div class="field"><label>Ενέκρινε</label><input name="approvedBy" value="${escapeHtml(p.approvedBy)}" placeholder="Όνομα"></div>
     </div>
+    ${needsApproval? `<p class="hint" style="color:var(--critical);">⚠ Το ποσό διαφέρει από το προκαθορισμένο (${fmtMoney(defCap)}) — μέχρι να εγκριθεί από διευθυντή, θα ισχύει ως όριο το προκαθορισμένο.</p>`:''}
     <div class="grid3" style="margin-top:12px;">
       <div class="field"><label>Τρόπος πληρωμής</label>
         <select name="planType">
@@ -1093,6 +1147,7 @@ function tabPayment(s){
   ${p.planType==='installments' ? renderInstallments(s) : ''}
 
   <div class="section-title" style="margin-top:22px;">Καταχώρηση πληρωμής</div>
+  <p class="hint" style="margin-top:-6px;">Έχουν καταχωρηθεί μέχρι στιγμής: <b>${fmtMoney(paidSum)}</b>${cap>0? ` από ${fmtMoney(cap)} ανώτατο (απομένουν ${fmtMoney(Math.max(0,cap-paidSum))})`:''}</p>
   <form id="logPaymentForm" data-id="${s.id}" class="grid3" style="align-items:end;">
     <div class="field"><label>Ποσό (€)</label><input name="amount" type="number" min="0" step="0.01" required></div>
     <div class="field"><label>Ημερομηνία</label><input name="date" type="date" value="${todayStr()}"></div>
@@ -1101,9 +1156,9 @@ function tabPayment(s){
   </form>
   <div class="table-wrap" style="margin-top:14px;">
     <table class="ntf-table">
-      <thead><tr><th>Ημερομηνία</th><th>Ποσό</th><th>Σημείωση</th><th>Καταχωρήθηκε από</th></tr></thead>
+      <thead><tr><th>Ημερομηνία</th><th>Ποσό</th><th>Σημείωση</th><th>Καταχωρήθηκε από</th>${Sb.isOwner()?'<th></th>':''}</tr></thead>
       <tbody>
-        ${(p.payments||[]).length? p.payments.slice().reverse().map(x=>`<tr><td>${fmtDate(x.date)}</td><td class="tabular">${fmtMoney(x.amount)}</td><td>${escapeHtml(x.note||'—')}</td><td>${escapeHtml(x.loggedBy||'—')}</td></tr>`).join('') : `<tr><td colspan="4" class="muted">Καμία πληρωμή ακόμη.</td></tr>`}
+        ${(p.payments||[]).length? p.payments.slice().reverse().map(x=>`<tr><td>${fmtDate(x.date)}</td><td class="tabular">${fmtMoney(x.amount)}</td><td>${escapeHtml(x.note||'—')}</td><td>${escapeHtml(x.loggedBy||'—')}</td>${Sb.isOwner()?`<td><button type="button" class="iconbtn" data-del-payment="${x.id}" data-student-id="${s.id}" title="Διαγραφή πληρωμής (μόνο ιδιοκτήτης)">✕</button></td>`:''}</tr>`).join('') : `<tr><td colspan="${Sb.isOwner()?5:4}" class="muted">Καμία πληρωμή ακόμη.</td></tr>`}
       </tbody>
     </table>
   </div>`;
@@ -1203,7 +1258,7 @@ function renderNotificationsView(){
   if(state.notifFilter!=='all') list = list.filter(n=>n.status===state.notifFilter);
   return `
   <h2 style="margin-bottom:4px;">Ειδοποιήσεις</h2>
-  <p class="muted" style="margin-bottom:16px;">Αυτόματα καταγεγραμμένες ειδοποιήσεις προς αποστολή με email/Slack. Αντιγράψτε το κείμενο και στείλτε το, έπειτα σημειώστε το ως απεσταλμένο.</p>
+  <p class="muted" style="margin-bottom:16px;">Οι ειδοποιήσεις στέλνονται αυτόματα με email μόλις δημιουργηθούν. Αν κάποιος παραλήπτης δεν έχει καταχωρημένο email, παραμένει «Εκκρεμεί» — αντιγράψτε το κείμενο και στείλτε το εσείς, έπειτα σημειώστε το ως απεσταλμένο.</p>
   <div class="chip-row" style="margin-bottom:14px;">
     ${filters.map(([k,l])=>`<button class="chip notif-filter ${state.notifFilter===k?'active':''}" data-nf="${k}">${l} <span class="n">${k==='all'?state.notifications.length:state.notifications.filter(n=>n.status===k).length}</span></button>`).join('')}
   </div>
@@ -1220,7 +1275,7 @@ function renderNotifTable(list){
         <td>${escapeHtml(notifTypeLabel(n.type))}</td>
         <td>${(n.recipients||[]).map(r=>`<span class="badge badge-neutral">${escapeHtml(r)}</span>`).join(' ')}</td>
         <td><div class="msg-preview"><b>${escapeHtml(n.subject||'')}</b><br>${escapeHtml(n.body||'')}</div></td>
-        <td>${n.status==='sent'? `<span class="badge badge-success">Εστάλη</span><br><span class="muted" style="font-size:11px;">${escapeHtml(n.sentBy||'')} · ${fmtDate(n.sentAt)}</span>` : `<span class="badge badge-warning">Εκκρεμεί</span>`}</td>
+        <td>${n.status==='sent'? `<span class="badge badge-success">Εστάλη</span><br><span class="muted" style="font-size:11px;">${escapeHtml(n.sentBy||'Αυτόματα με email')} · ${fmtDate(n.sentAt)}</span>` : `<span class="badge badge-warning">Εκκρεμεί</span>`}</td>
         <td>
           <div class="row-actions">
             <button class="btn btn-ghost btn-sm" data-copy="${n.id}">Αντιγραφή</button>
@@ -1284,6 +1339,7 @@ function renderSettingsView(){
           <select class="dep-type">
             <option value="pool" ${d.type==='pool'?'selected':''}>Πισίνα</option>
             <option value="sea" ${d.type==='sea'?'selected':''}>Θάλασσα</option>
+            <option value="boat" ${d.type==='boat'?'selected':''}>Ταχύπλοο</option>
           </select>
           <input type="date" class="dep-start" value="${d.startDate||''}">
           ${Sb.isOwner()? `<button type="button" class="iconbtn" data-remove-dep="${d.id}">✕</button>` : '<span></span>'}
@@ -1370,15 +1426,16 @@ function attachHandlers(){
     patch.registry = {
       pool: fd.get('poolEnabled')==='on' ? {number: fd.get('poolNumber')||'', departmentId: fd.get('poolDept')||''} : null,
       sea: fd.get('seaEnabled')==='on' ? {number: fd.get('seaNumber')||'', departmentId: fd.get('seaDept')||''} : null,
+      boat: fd.get('boatEnabled')==='on' ? {number: fd.get('boatNumber')||'', departmentId: fd.get('boatDept')||''} : null,
     };
     updateStudent(id, patch).then(()=>{
       const updated = Object.assign({}, student, patch);
       if(wasSeaEmpty && updated.registry.sea && updated.registry.sea.number){ triggerSeaAssigned(updated); }
     });
   });
-  document.querySelectorAll('input[name="poolEnabled"], input[name="seaEnabled"]').forEach(chk=>{
+  document.querySelectorAll('input[name="poolEnabled"], input[name="seaEnabled"], input[name="boatEnabled"]').forEach(chk=>{
     chk.addEventListener('change', e=>{
-      const prefix = e.target.name.startsWith('pool')?'pool':'sea';
+      const prefix = e.target.name.replace('Enabled','');
       document.querySelector(`[name="${prefix}Number"]`).disabled = !e.target.checked;
       document.querySelector(`[name="${prefix}Dept"]`).disabled = !e.target.checked;
     });
@@ -1406,7 +1463,14 @@ function attachHandlers(){
     const id = lpf.dataset.id;
     const student = state.students.find(x=>x.id===id);
     const wasAnyPayment = (student.payment.payments||[]).length>0;
-    const newPayment = {id:uid(), amount:Number(fd.get('amount')), date: fd.get('date')||todayStr(), note: fd.get('note')||'', loggedBy: Sb.me?Sb.me.name:''};
+    const amount = Number(fd.get('amount'));
+    const sumSoFar = (student.payment.payments||[]).reduce((a,x)=>a+(Number(x.amount)||0),0);
+    const cap = effectivePaymentCap(student);
+    if(cap>0 && sumSoFar+amount > cap+0.009){
+      toast(`Το ποσό υπερβαίνει το ανώτατο επιτρεπτό (${fmtMoney(cap)}). Χρειάζεται έγκριση διευθυντή στην καρτέλα Πληρωμή για μεγαλύτερο ποσό.`);
+      return;
+    }
+    const newPayment = {id:uid(), amount, date: fd.get('date')||todayStr(), note: fd.get('note')||'', loggedBy: Sb.me?Sb.me.name:''};
     const payments = (student.payment.payments||[]).concat([newPayment]);
     updateStudent(id, {'payment.payments': payments}).then(()=>{
       triggerPaymentLogged(student, newPayment);
@@ -1417,6 +1481,21 @@ function attachHandlers(){
       }
     });
   });
+  document.querySelectorAll('[data-del-payment]').forEach(b=>b.addEventListener('click', async ()=>{
+    const id = b.dataset.studentId;
+    const payId = b.dataset.delPayment;
+    const student = state.students.find(x=>x.id===id);
+    if(!student) return;
+    const pay = (student.payment.payments||[]).find(x=>x.id===payId);
+    if(!pay) return;
+    if(!window.confirm(`Οριστική διαγραφή πληρωμής ${fmtMoney(pay.amount)} (${fmtDate(pay.date)});`)) return;
+    const payments = (student.payment.payments||[]).filter(x=>x.id!==payId);
+    try{
+      await updateStudent(id, {'payment.payments': payments});
+      await Sb.client.from('deletion_log').insert({entity_type:'payment', entity_name:`${student.name} — ${fmtMoney(pay.amount)} (${fmtDate(pay.date)})`});
+      toast('Η πληρωμή διαγράφηκε');
+    }catch(e){ /* server already toasted the reason (e.g. not the owner) */ }
+  }));
   const addInst = document.getElementById('addInstallmentBtn');
   if(addInst) addInst.addEventListener('click', ()=>{
     const student = state.students.find(x=>x.id===addInst.dataset.id);
