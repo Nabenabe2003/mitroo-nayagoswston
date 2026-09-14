@@ -1,0 +1,1570 @@
+<title>Μητρώο Ναυαγοσωστών</title>
+<style>
+:root{
+  --bg:#EEF4F5; --surface:#FFFFFF; --surface-alt:#E3EDEF;
+  --ink:#0E2B33; --ink-muted:#51707A;
+  --accent:#0E6E7C; --accent-strong:#084753; --accent-soft:#DCEFF1;
+  --coral:#E85B3A; --coral-strong:#C6461F; --coral-soft:#FBE3DB;
+  --success:#2E8B57; --success-soft:#DEF3E7;
+  --warning:#B9790A; --warning-soft:#FBEBD1;
+  --critical:#C63C3C; --critical-soft:#FBE1E1;
+  --border:#D3E2E4;
+  --shadow:0 1px 2px rgba(14,43,51,.07),0 8px 24px rgba(14,43,51,.07);
+  --font-display:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A1B20; --surface:#102A31; --surface-alt:#153A41;
+    --ink:#E7F1F2; --ink-muted:#94B4BB;
+    --accent:#5FD0DE; --accent-strong:#8FE0EB; --accent-soft:#163A41;
+    --coral:#FF8A68; --coral-strong:#FFB199; --coral-soft:#3A241D;
+    --success:#6FCB9A; --success-soft:#153326;
+    --warning:#E7B45B; --warning-soft:#3A2E13;
+    --critical:#F08E88; --critical-soft:#3B1E1E;
+    --border:#1E434A;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A1B20; --surface:#102A31; --surface-alt:#153A41;
+  --ink:#E7F1F2; --ink-muted:#94B4BB;
+  --accent:#5FD0DE; --accent-strong:#8FE0EB; --accent-soft:#163A41;
+  --coral:#FF8A68; --coral-strong:#FFB199; --coral-soft:#3A241D;
+  --success:#6FCB9A; --success-soft:#153326;
+  --warning:#E7B45B; --warning-soft:#3A2E13;
+  --critical:#F08E88; --critical-soft:#3B1E1E;
+  --border:#1E434A;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;}
+html,body{margin:0; padding:0; background:var(--bg); color:var(--ink);}
+body{font-family:var(--font-body); font-size:14px; line-height:1.45;}
+h1,h2,h3,h4{font-family:var(--font-display); margin:0; text-wrap:balance; letter-spacing:.01em;}
+button{font-family:var(--font-body); cursor:pointer;}
+input,select,textarea{font-family:var(--font-body); font-size:13.5px; color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:7px 9px;}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+table{border-collapse:collapse; width:100%;}
+.tabular{font-variant-numeric:tabular-nums;}
+a{color:var(--accent-strong);}
+[hidden]{display:none !important;}
+
+#app{min-height:100vh; display:flex; flex-direction:column;}
+
+.topbar{display:flex; align-items:center; gap:14px; padding:10px 16px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:20; flex-wrap:wrap;}
+.brand{display:flex; align-items:center; gap:9px; margin-right:6px;}
+.brand-mark{width:30px; height:30px; border-radius:8px; background:linear-gradient(155deg,var(--accent),var(--accent-strong)); display:flex; align-items:center; justify-content:center; color:#fff; font-family:var(--font-display); font-weight:700; font-size:15px; flex:none;}
+.brand-name{font-family:var(--font-display); font-weight:700; font-size:16px;}
+.nav-tabs{display:flex; gap:2px; background:var(--surface-alt); padding:3px; border-radius:9px;}
+.nav-tab{border:none; background:transparent; padding:7px 13px; border-radius:7px; font-size:13.5px; font-weight:600; color:var(--ink-muted);}
+.nav-tab.active{background:var(--surface); color:var(--accent-strong); box-shadow:var(--shadow);}
+.spacer{flex:1;}
+.stat-pill{display:flex; align-items:center; gap:6px; background:var(--surface-alt); border-radius:20px; padding:5px 11px; font-size:12.5px; font-weight:600; color:var(--ink-muted);}
+.stat-pill b{color:var(--ink); font-family:var(--font-display); font-size:14px;}
+.bell-btn{position:relative; border:1px solid var(--border); background:var(--surface); border-radius:9px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:16px;}
+.bell-badge{position:absolute; top:-5px; right:-5px; background:var(--coral); color:#fff; font-size:10.5px; font-weight:700; border-radius:10px; min-width:17px; height:17px; display:flex; align-items:center; justify-content:center; padding:0 4px;}
+.staff-select{border-radius:9px;}
+.btn{border:1px solid transparent; border-radius:8px; padding:8px 14px; font-weight:600; font-size:13.5px; display:inline-flex; align-items:center; gap:7px; white-space:nowrap;}
+.btn-primary{background:var(--accent); color:#fff;}
+.btn-primary:hover{background:var(--accent-strong);}
+.btn-coral{background:var(--coral); color:#fff;}
+.btn-coral:hover{background:var(--coral-strong);}
+.btn-ghost{background:transparent; border-color:var(--border); color:var(--ink);}
+.btn-ghost:hover{background:var(--surface-alt);}
+.btn-danger{background:transparent; border-color:var(--critical); color:var(--critical);}
+.btn-sm{padding:5px 10px; font-size:12.5px; border-radius:7px;}
+
+.main{flex:1; display:flex; min-height:0;}
+.rail{width:308px; flex:none; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:14px; gap:11px; overflow-y:auto;}
+.content{flex:1; min-width:0; overflow-y:auto; padding:20px 24px 60px;}
+@media (max-width:860px){
+  .main{flex-direction:column;}
+  .rail{width:100%; border-right:none; border-bottom:1px solid var(--border); max-height:46vh;}
+  .content{padding:16px;}
+}
+
+.search-box{position:relative;}
+.search-box input{width:100%; padding-left:30px;}
+.search-box::before{content:"⌕"; position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--ink-muted); font-size:15px;}
+.chip-row{display:flex; flex-wrap:wrap; gap:6px;}
+.chip{border:1px solid var(--border); background:var(--surface); border-radius:20px; padding:5px 11px; font-size:12px; font-weight:600; color:var(--ink-muted);}
+.chip.active{background:var(--accent-soft); border-color:var(--accent); color:var(--accent-strong);}
+.chip .n{opacity:.7; margin-left:3px;}
+
+.student-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:5px; overflow-y:auto;}
+.student-row{display:flex; align-items:flex-start; gap:9px; padding:9px 10px; border-radius:9px; border:1px solid transparent; text-align:left; background:transparent; width:100%;}
+.student-row:hover{background:var(--surface-alt);}
+.student-row.active{background:var(--accent-soft); border-color:var(--accent);}
+.avatar{width:32px; height:32px; border-radius:50%; background:var(--surface-alt); color:var(--ink-muted); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12.5px; flex:none; font-family:var(--font-display);}
+.student-row .meta{min-width:0; flex:1;}
+.student-row .name{font-weight:600; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.student-row .sub{font-size:11.5px; color:var(--ink-muted); display:flex; align-items:center; gap:5px; margin-top:2px;}
+.alert-dot{width:7px; height:7px; border-radius:50%; background:var(--warning); flex:none; margin-top:5px;}
+.alert-dot.critical{background:var(--critical);}
+
+.badge{display:inline-flex; align-items:center; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; font-family:var(--font-display); letter-spacing:.02em;}
+.badge-neutral{background:var(--surface-alt); color:var(--ink-muted);}
+.badge-accent{background:var(--accent-soft); color:var(--accent-strong);}
+.badge-success{background:var(--success-soft); color:var(--success);}
+.badge-warning{background:var(--warning-soft); color:var(--warning);}
+.badge-critical{background:var(--critical-soft); color:var(--critical);}
+
+.card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow:var(--shadow);}
+.section-title{font-family:var(--font-display); font-weight:700; font-size:15px; margin-bottom:12px; display:flex; align-items:center; gap:8px;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+@media (max-width:640px){.grid2,.grid3{grid-template-columns:1fr;}}
+.field{display:flex; flex-direction:column; gap:5px;}
+.field label{font-size:12px; font-weight:600; color:var(--ink-muted);}
+.field input,.field select,.field textarea{width:100%;}
+.hint{font-size:11.5px; color:var(--ink-muted); margin-top:3px;}
+.detail-tabs{display:flex; gap:4px; overflow-x:auto; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:0;}
+.detail-tab{border:none; background:transparent; padding:9px 13px; font-weight:600; font-size:13px; color:var(--ink-muted); border-bottom:2px solid transparent; white-space:nowrap;}
+.detail-tab.active{color:var(--accent-strong); border-color:var(--accent);}
+.empty-state{display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:10px; padding:70px 20px; color:var(--ink-muted);}
+.empty-state .glyph{font-size:34px;}
+.detail-header{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; flex-wrap:wrap;}
+.checklist-row{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border);}
+.checklist-row:last-child{border-bottom:none;}
+.checklist-row label{flex:1; font-size:13.5px;}
+.eligibility-row{display:flex; align-items:center; gap:10px; padding:8px 0;}
+.eligibility-icon{width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex:none;}
+.eligibility-icon.ok{background:var(--success);}
+.eligibility-icon.bad{background:var(--critical);}
+.toast-wrap{position:fixed; bottom:18px; right:18px; display:flex; flex-direction:column; gap:8px; z-index:100;}
+.toast{background:var(--ink); color:var(--bg); padding:10px 15px; border-radius:9px; font-size:13px; box-shadow:var(--shadow); max-width:320px;}
+:root[data-theme="dark"] .toast, :root:not([data-theme="light"]) .toast{background:var(--surface-alt); color:var(--ink); border:1px solid var(--border);}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .toast{background:var(--surface-alt); color:var(--ink); border:1px solid var(--border);}}
+
+.modal-backdrop{position:fixed; inset:0; background:rgba(10,25,30,.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:60;}
+.modal{background:var(--surface); border-radius:14px; padding:22px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:var(--shadow);}
+.modal h3{margin-bottom:14px;}
+.modal-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:16px;}
+
+.table-wrap{overflow-x:auto;}
+.ntf-table th{text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-muted); padding:8px 10px; border-bottom:1px solid var(--border);}
+.ntf-table td{padding:10px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:top;}
+.ntf-table tr:last-child td{border-bottom:none;}
+.msg-preview{background:var(--surface-alt); border-radius:8px; padding:8px 10px; font-size:12px; color:var(--ink-muted); max-width:340px; white-space:pre-wrap;}
+.pill-row{display:flex; gap:6px; flex-wrap:wrap;}
+.staff-card{display:grid; grid-template-columns:1.3fr 1fr auto; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);}
+@media (max-width:640px){.staff-card{grid-template-columns:1fr;}}
+.dep-card{display:grid; grid-template-columns:1.3fr .8fr .9fr auto; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);}
+@media (max-width:640px){.dep-card{grid-template-columns:1fr 1fr;}}
+.iconbtn{border:1px solid var(--border); background:var(--surface); border-radius:7px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; color:var(--ink-muted);}
+.iconbtn:hover{color:var(--critical); border-color:var(--critical);}
+.banner{display:flex; align-items:center; gap:10px; background:var(--warning-soft); color:var(--warning); border:1px solid var(--warning); border-radius:9px; padding:9px 13px; font-size:13px; font-weight:600; margin-bottom:14px;}
+.banner button{margin-left:auto;}
+.slide-over{position:fixed; top:0; right:0; height:100vh; width:min(420px,100vw); background:var(--surface); border-left:1px solid var(--border); box-shadow:var(--shadow); z-index:70; padding:18px; overflow-y:auto;}
+.slide-over-backdrop{position:fixed; inset:0; background:rgba(10,25,30,.35); z-index:65;}
+.muted{color:var(--ink-muted);}
+.row-actions{display:flex; gap:6px; flex-wrap:wrap;}
+</style>
+
+<div id="app"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+<script>
+/* ---------------- constants ---------------- */
+const STAGES = [
+  {key:'lead', label:'Νέο ενδιαφέρον', badge:'neutral'},
+  {key:'contacted', label:'Σε επικοινωνία', badge:'accent'},
+  {key:'no_interest', label:'Δεν ενδιαφέρεται', badge:'neutral'},
+  {key:'interested_later', label:'Ενδιαφέρεται αργότερα', badge:'warning'},
+  {key:'enrolling', label:'Θέλει να ενταχθεί', badge:'accent'},
+  {key:'in_training', label:'Σε εκπαίδευση', badge:'success'},
+  {key:'certified', label:'Πιστοποιήθηκε', badge:'success'},
+  {key:'dropped', label:'Διέκοψε', badge:'critical'},
+];
+const SOURCES = [
+  {key:'phone', label:'Τηλεφωνική κλήση'},
+  {key:'email', label:'Email'},
+  {key:'social', label:'Site / Social media'},
+  {key:'office', label:'Επίσκεψη στη σχολή'},
+];
+const POOL_TOTAL_HOURS = 26;
+const SEA_TOTAL_HOURS = 110;
+const DEFAULT_CONFIG = {
+  schoolName:'Σχολή Ναυαγοσωστών',
+  minDeposit: 100,
+  minDepositWithApproval: 50,
+  enrollingDelayDays: 3,
+};
+
+/* ---------------- state ---------------- */
+const state = {
+  ready:false,
+  config: null,
+  students: [],
+  notifications: [],
+  departments: [],
+  profiles: [],
+  view: 'students',
+  selectedId: null,
+  stageFilter: 'all',
+  trackFilter: 'all',
+  search: '',
+  detailTab: 'contact',
+  detailDirty:false,
+  staleNotice:false,
+  notifFilter:'pending',
+};
+
+function safeGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function safeSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+/* ---------------- Supabase backend ----------------
+   Fill these in from your project's Settings → API page. The anon key is
+   meant to be public (it is what every visitor's browser uses) — real
+   protection comes from the row-level security policies in schema.sql,
+   not from hiding this key. */
+const SUPABASE_URL = 'https://zezpahanozmztbrhvifh.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_hLy3Iwxe2h3pVyr263rZZQ_l8SlpKpQ';
+
+function profileName(id){
+  if(!id) return '';
+  const p = state.profiles.find(p=>p.id===id);
+  return p ? p.name : '';
+}
+
+function rowToProfile(r){ return { id:r.id, email:r.email||'', name:r.name||r.email||'', role:r.role||'staff', isBoard:!!r.is_board }; }
+function rowToDepartment(r){ return { id:r.id, name:r.name||'', type:r.type||'pool', startDate:r.start_date||null }; }
+function departmentToRow(d){ const row = { name:d.name||'', type:d.type||'pool', start_date:d.startDate||null }; if(d.id) row.id=d.id; return row; }
+function rowToSettings(r){ return { schoolName:r.school_name||'Σχολή Ναυαγοσωστών', minDeposit:Number(r.min_deposit)||100, minDepositWithApproval:Number(r.min_deposit_with_approval)||50, enrollingDelayDays:r.enrolling_delay_days||3 }; }
+function rowToNotification(r){
+  return { id:r.id, studentId:r.student_id, studentName:r.student_name||'', type:r.type, triggerKey:r.trigger_key||null,
+    channel:r.channel||'both', dueDate:r.due_date, createdAt:r.created_at, recipients:r.recipients||[],
+    subject:r.subject||'', body:r.body||'', status:r.status||'pending', sentAt:r.sent_at, sentBy: profileName(r.sent_by) };
+}
+function notificationToRow(n){
+  const row = {
+    student_id:n.studentId||null, student_name:n.studentName||'', type:n.type, trigger_key:n.triggerKey||null,
+    channel:n.channel||'both', due_date:n.dueDate||null, recipients:n.recipients||[],
+    subject:n.subject||'', body:n.body||'', status:n.status||'pending',
+  };
+  if(n.id) row.id = n.id;
+  return row;
+}
+function rowToStudent(r){
+  return {
+    id:r.id, name:r.name||'', phone:r.phone||'', email:r.email||'', source:r.source||'phone', sourceNote:r.source_note||'',
+    createdAt:r.created_at, createdBy:r.created_by, updatedAt:r.updated_at, updatedBy:r.updated_by,
+    stage:r.stage||'lead', stageNote:r.stage_note||'', age:r.age,
+    followUp: r.follow_up||{hasDate:false,date:null,lastReminderAt:null},
+    reengage: r.reengage||{lastReminderAt:null},
+    enrollingSince:r.enrolling_since, enrollingLastBoardAlertAt:r.enrolling_last_board_alert_at, infoEmailSent:!!r.info_email_sent,
+    registry: r.registry||{pool:null,sea:null},
+    payment: r.payment||{totalAmount:null,directorApproved:false,approvedBy:'',planType:'single',installments:[],receiptType:'receipt',afm:'',payments:[]},
+    documents: r.documents||{application:false,photos:false,idCopy:false,medicalRequired:4,medicalProvided:0},
+    training: r.training||{poolHours:0,seaHours:0,lastAttendanceUpdate:null,lastAttendanceReminderAt:null,performanceApproved:false},
+    notes: r.notes||'',
+  };
+}
+function studentToRow(s){
+  const row = {
+    name:s.name||'', phone:s.phone||'', email:s.email||'', source:s.source||'phone', source_note:s.sourceNote||'',
+    stage:s.stage||'lead', stage_note:s.stageNote||'', age:s.age,
+    follow_up:s.followUp, reengage:s.reengage,
+    enrolling_since:s.enrollingSince||null, enrolling_last_board_alert_at:s.enrollingLastBoardAlertAt||null, info_email_sent:!!s.infoEmailSent,
+    registry:s.registry, payment:s.payment, documents:s.documents, training:s.training, notes:s.notes||'',
+  };
+  if(s.id) row.id = s.id;
+  return row;
+}
+
+const Sb = {
+  client:null, me:null, channel:null,
+
+  init(){ this.client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); },
+  isOwner(){ return !!(this.me && this.me.role==='owner'); },
+
+  async getSession(){ const {data} = await this.client.auth.getSession(); return data.session; },
+  async signUp(email, password, name){
+    const {data, error} = await this.client.auth.signUp({ email, password, options:{ data:{name} } });
+    if(error) throw error;
+    return data;
+  },
+  async signIn(email, password){
+    const {data, error} = await this.client.auth.signInWithPassword({ email, password });
+    if(error) throw error;
+    return data;
+  },
+  async signOut(){ this.unsubscribeRealtime(); await this.client.auth.signOut(); },
+
+  async loadMe(userId){
+    // the profile row is created by a database trigger on signup; it can
+    // take an instant to land, so retry briefly instead of failing.
+    for(let i=0;i<5;i++){
+      const {data, error} = await this.client.from('profiles').select('*').eq('id', userId).maybeSingle();
+      if(data){ this.me = rowToProfile(data); return this.me; }
+      await new Promise(r=>setTimeout(r, 400));
+    }
+    throw new Error('Δεν βρέθηκε προφίλ χρήστη.');
+  },
+  async loadAll(){
+    const [studentsR, notifR, depR, settingsR, profilesR] = await Promise.all([
+      this.client.from('students').select('*'),
+      this.client.from('notifications').select('*').order('created_at',{ascending:false}),
+      this.client.from('departments').select('*'),
+      this.client.from('app_settings').select('*').eq('id',1).maybeSingle(),
+      this.client.from('profiles').select('*'),
+    ]);
+    if(studentsR.error) throw studentsR.error;
+    state.profiles = (profilesR.data||[]).map(rowToProfile);
+    state.students = (studentsR.data||[]).map(rowToStudent);
+    state.notifications = (notifR.data||[]).map(rowToNotification);
+    state.departments = (depR.data||[]).map(rowToDepartment);
+    state.config = settingsR.data ? rowToSettings(settingsR.data) : JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  },
+  subscribeRealtime(){
+    this.unsubscribeRealtime();
+    // look up state[stateKey] fresh on every event, rather than capturing an
+    // array reference at subscribe-time — Sb.loadAll() (e.g. the manual
+    // refresh button) reassigns those arrays, which would otherwise make
+    // this subscription silently write into an orphaned, discarded array.
+    const upsertInto = (stateKey, mapper) => payload => {
+      const arr = state[stateKey];
+      if(payload.eventType==='DELETE'){
+        const idx = arr.findIndex(x=>x.id===payload.old.id);
+        if(idx>=0) arr.splice(idx,1);
+      } else {
+        const row = mapper(payload.new);
+        const idx = arr.findIndex(x=>x.id===row.id);
+        if(idx>=0) arr[idx]=row; else arr.unshift(row);
+      }
+      render();
+    };
+    this.channel = this.client.channel('app-changes')
+      .on('postgres_changes', {event:'*', schema:'public', table:'students'}, p=>{ upsertInto('students', rowToStudent)(p); scheduleRuleCheck(); })
+      .on('postgres_changes', {event:'*', schema:'public', table:'notifications'}, upsertInto('notifications', rowToNotification))
+      .on('postgres_changes', {event:'*', schema:'public', table:'departments'}, upsertInto('departments', rowToDepartment))
+      .on('postgres_changes', {event:'*', schema:'public', table:'profiles'}, upsertInto('profiles', rowToProfile))
+      .on('postgres_changes', {event:'*', schema:'public', table:'app_settings'}, p=>{ if(p.new) state.config = rowToSettings(p.new); render(); })
+      .subscribe();
+  },
+  unsubscribeRealtime(){ if(this.channel){ this.client.removeChannel(this.channel); this.channel=null; } },
+
+  async upsertStudent(student){
+    const {data, error} = await this.client.from('students').upsert(studentToRow(student)).select().single();
+    if(error){ toast('Σφάλμα αποθήκευσης: '+error.message); throw error; }
+    return rowToStudent(data);
+  },
+  async deleteStudent(id, name){
+    const {error} = await this.client.from('students').delete().eq('id', id);
+    if(error){ toast('Δεν επιτρέπεται η διαγραφή: '+error.message); throw error; }
+    await this.client.from('deletion_log').insert({entity_type:'student', entity_name:name||''});
+  },
+  async upsertNotification(n){
+    const {error} = await this.client.from('notifications').upsert(notificationToRow(n));
+    if(error){
+      if(error.code==='23505') return true; // duplicate trigger_key — already exists server-side
+      toast('Σφάλμα ειδοποίησης: '+error.message);
+    }
+    return false;
+  },
+  async upsertDepartment(d){
+    const {data, error} = await this.client.from('departments').upsert(departmentToRow(d)).select().single();
+    if(error){ toast('Σφάλμα τμήματος: '+error.message); throw error; }
+    return rowToDepartment(data);
+  },
+  async deleteDepartment(id, name){
+    const {error} = await this.client.from('departments').delete().eq('id', id);
+    if(error){ toast('Δεν επιτρέπεται η διαγραφή: '+error.message); throw error; }
+    await this.client.from('deletion_log').insert({entity_type:'department', entity_name:name||''});
+  },
+  async updateSettings(patch){
+    const {error} = await this.client.from('app_settings').update(patch).eq('id',1);
+    if(error) toast('Σφάλμα ρυθμίσεων: '+error.message);
+  },
+  async updateProfile(id, patch){
+    const {error} = await this.client.from('profiles').update(patch).eq('id', id);
+    if(error) toast('Σφάλμα: '+error.message);
+  },
+};
+function getStudent(id){ return state.students.find(s=>s.id===id); }
+function applyDotPatch(obj, patch){
+  Object.keys(patch).forEach(k=>{
+    const parts = k.split('.');
+    let cur = obj;
+    parts.forEach((p,i)=>{
+      if(i===parts.length-1){ cur[p]=patch[k]; }
+      else { cur[p] = cur[p] || {}; cur = cur[p]; }
+    });
+  });
+}
+
+/* ---------------- utils ---------------- */
+function uid(){ try{ return crypto.randomUUID(); }catch(e){ return 'id-'+Date.now()+'-'+Math.random().toString(36).slice(2,9); } }
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(d){ if(!d) return '—'; const dt = new Date(d); if(isNaN(dt)) return '—'; return dt.toLocaleDateString('el-GR'); }
+function fmtDateTime(d){ if(!d) return '—'; const dt=new Date(d); if(isNaN(dt)) return '—'; return dt.toLocaleDateString('el-GR')+' '+dt.toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'}); }
+function fmtMoney(n){ if(n==null||isNaN(n)) return '—'; return Number(n).toLocaleString('el-GR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function stageInfo(key){ return STAGES.find(s=>s.key===key) || STAGES[0]; }
+function toast(msg){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent=msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 3400);
+}
+function staffByName(name){ return state.profiles.find(p=>p.name===name); }
+
+/* ---------------- data model helpers ---------------- */
+function newStudent(base){
+  const now = new Date().toISOString();
+  return Object.assign({
+    name:'', phone:'', email:'', source:'phone', sourceNote:'',
+    createdAt: now, createdBy: Sb.me&&Sb.me.id||'', updatedAt: now, updatedBy: Sb.me&&Sb.me.id||'',
+    stage:'lead', stageNote:'', age:null,
+    followUp:{ hasDate:false, date:null, lastReminderAt:null },
+    reengage:{ lastReminderAt:null },
+    enrollingSince:null, enrollingLastBoardAlertAt:null, infoEmailSent:false,
+    registry:{ pool:null, sea:null },
+    payment:{
+      totalAmount:null, directorApproved:false, approvedBy:'',
+      planType:'single', installments:[],
+      receiptType:'receipt', afm:'',
+      payments:[]
+    },
+    documents:{ application:false, photos:false, idCopy:false, medicalRequired:4, medicalProvided:0 },
+    training:{ poolHours:0, seaHours:0, lastAttendanceUpdate:null, lastAttendanceReminderAt:null, performanceApproved:false },
+    notes:''
+  }, base||{});
+}
+
+function depositMinimum(student){
+  return student.payment.directorApproved && student.payment.depositApprovedLower ? state.config.minDepositWithApproval : state.config.minDeposit;
+}
+
+function computeAbsencePct(student){
+  const out = {};
+  if(student.registry.pool){
+    out.pool = Math.max(0, Math.round(((POOL_TOTAL_HOURS - (student.training.poolHours||0)) / POOL_TOTAL_HOURS) * 100));
+  }
+  if(student.registry.sea){
+    out.sea = Math.max(0, Math.round(((SEA_TOTAL_HOURS - (student.training.seaHours||0)) / SEA_TOTAL_HOURS) * 100));
+  }
+  return out;
+}
+
+function isFullyPaid(student){
+  const p = student.payment;
+  if(p.totalAmount==null) return false;
+  const paidSum = (p.payments||[]).reduce((a,x)=>a+(Number(x.amount)||0),0);
+  return paidSum >= p.totalAmount - 0.01;
+}
+
+function computeEligibility(student){
+  const abs = computeAbsencePct(student);
+  const absOk = Object.values(abs).every(v=>v<=20) && (student.registry.pool || student.registry.sea);
+  const paid = isFullyPaid(student);
+  const medicalOk = (student.documents.medicalProvided||0) >= (student.documents.medicalRequired||4);
+  const docsOk = student.documents.application && student.documents.photos && student.documents.idCopy && medicalOk;
+  const perfOk = !!student.training.performanceApproved;
+  return {
+    absOk, paid, medicalOk, docsOk, perfOk,
+    all: absOk && paid && docsOk && perfOk
+  };
+}
+
+function computeAlerts(student){
+  const alerts = [];
+  if(student.stage==='interested_later'){
+    if(student.followUp.hasDate && student.followUp.date && student.followUp.date <= todayStr()){
+      alerts.push({level:'warning', text:'Ήρθε η ημερομηνία επανεπικοινωνίας'});
+    }
+    if(!student.followUp.hasDate){
+      const last = student.followUp.lastReminderAt;
+      if(!last || daysBetween(last, new Date().toISOString()) >= 30){
+        alerts.push({level:'warning', text:'Μηνιαία υπενθύμιση επικοινωνίας'});
+      }
+    }
+  }
+  if(['enrolling','in_training'].includes(student.stage)){
+    const total = (student.payment.payments||[]).reduce((a,x)=>a+(Number(x.amount)||0),0);
+    if(student.payment.totalAmount!=null && total < depositMinimum(student)){
+      alerts.push({level:'critical', text:'Δεν έχει καλυφθεί η προκαταβολή'});
+    }
+  }
+  if(student.stage==='no_interest'){
+    const last = student.reengage.lastReminderAt || student.createdAt;
+    if(daysBetween(last, new Date().toISOString()) >= 180){
+      alerts.push({level:'warning', text:'Πέρασαν 6 μήνες — ίσως αξίζει νέα επικοινωνία'});
+    }
+  }
+  if(student.stage==='enrolling' && !student.registry.pool && !student.registry.sea && student.enrollingSince){
+    if(daysBetween(student.enrollingSince, new Date().toISOString()) >= (state.config.enrollingDelayDays||3)){
+      alerts.push({level:'critical', text:'Καθυστερεί η τοποθέτηση σε τμήμα'});
+    }
+  }
+  if(student.stage==='in_training'){
+    const lu = student.training.lastAttendanceUpdate;
+    if(!lu || daysBetween(lu, new Date().toISOString()) > 14){
+      alerts.push({level:'critical', text:'Δεν έχει ενημερωθεί το παρουσιολόγιο'});
+    }
+  }
+  if(student.stage==='in_training' || student.stage==='enrolling'){
+    const elig = computeEligibility(student);
+    if(elig.all) alerts.push({level:'success', text:'Έτοιμος/η για πιστοποιητικό'});
+  }
+  return alerts;
+}
+
+/* ---------------- notification templates ---------------- */
+function addNotification(data){
+  const key = data.triggerKey;
+  if(key && state.notifications.some(n=>n.triggerKey===key)) return;
+  const doc = Object.assign({
+    id: uid(), createdAt:new Date().toISOString(), dueDate:null, channel:'both',
+    status:'pending', sentAt:null, sentBy:null
+  }, data);
+  // optimistic: show it immediately; the server (or our own realtime echo)
+  // reconciles it moments later. A duplicate trigger_key is silently
+  // rejected by the database's unique index (two staff triggering the same
+  // rule at once) — in that case we just drop our local optimistic copy.
+  state.notifications.unshift(doc);
+  render();
+  Sb.upsertNotification(doc).then(dropped=>{
+    if(dropped){
+      const idx = state.notifications.findIndex(n=>n.id===doc.id);
+      if(idx>=0){ state.notifications.splice(idx,1); render(); }
+    }
+  });
+}
+
+function triggerSeaAssigned(student){
+  const eumorfia = staffByName('Ευμορφία');
+  addNotification({
+    triggerKey:`sea-assigned:${student.id}`,
+    type:'sea_registry',
+    recipients:['Ευμορφία'],
+    channel:'both',
+    studentId:student.id, studentName:student.name,
+    subject:`Νέα εγγραφή θαλάσσης – ${student.name}`,
+    body:`Ενημέρωση για το ταχύπλοο: ο/η ${student.name} εντάχθηκε στο μητρώο θαλάσσης με αριθμό μητρώου ${student.registry.sea.number}.${eumorfia&&eumorfia.email? ' (email: '+eumorfia.email+')':''}`
+  });
+}
+
+function triggerPaymentLogged(student, payment){
+  addNotification({
+    triggerKey:null,
+    type:'payment',
+    recipients:['Ελισάβετ','Γραφείο'],
+    channel:'both',
+    studentId:student.id, studentName:student.name,
+    subject:`Πληρωμή ${fmtMoney(payment.amount)} – ${student.name}`,
+    body:`Καταχωρήθηκε πληρωμή ${fmtMoney(payment.amount)} από τον/την ${student.name} (${fmtDate(payment.date)}). `
+      +`Παραστατικό: ${student.payment.receiptType==='invoice'?'Τιμολόγιο':'Απόδειξη'}`
+      +(student.payment.receiptType==='invoice'? ` – ΑΦΜ: ${student.payment.afm||'—'}`:'')
+      +`. Παρακαλώ κόψτε το σχετικό παραστατικό.`
+  });
+}
+
+function triggerExamMaterials(student){
+  const parts = [];
+  if(student.registry.pool) parts.push('πισίνα: οι 600 ερωτήσεις με τις απαντήσεις τους, τα 100 τεστ και τα απαντητικά φυλλάδια');
+  if(student.registry.sea) parts.push('θάλασσα: οι 1000 ερωτήσεις με τις απαντήσεις τους');
+  if(!parts.length) return;
+  addNotification({
+    triggerKey:`exam-materials:${student.id}`,
+    type:'exam_materials',
+    recipients:['Βαλεντίνα'],
+    channel:'both',
+    studentId:student.id, studentName:student.name,
+    subject:`Αποστολή εξεταστικού υλικού – ${student.name}`,
+    body:`Καταβλήθηκε προκαταβολή. Να σταλεί στον/στην ${student.name} (${student.email||'χωρίς email'}): ${parts.join(' | ')}.`
+  });
+}
+
+function triggerFollowupDate(student){
+  addNotification({
+    triggerKey:`followup:${student.id}:${student.followUp.date}`,
+    type:'followup',
+    recipients:['Γραφείο'],
+    channel:'both',
+    dueDate: student.followUp.date,
+    studentId:student.id, studentName:student.name,
+    subject:`Επανεπικοινωνία – ${student.name}`,
+    body:`Ο/Η ${student.name} (${student.phone||student.email||'—'}) είχε πει να επικοινωνήσουμε ξανά γύρω στις ${fmtDate(student.followUp.date)}.`
+  });
+}
+
+function triggerMonthlyFollowup(student){
+  const monthKey = new Date().toISOString().slice(0,7);
+  addNotification({
+    triggerKey:`followup-monthly:${student.id}:${monthKey}`,
+    type:'followup_monthly',
+    recipients:['Γραφείο'],
+    channel:'both',
+    studentId:student.id, studentName:student.name,
+    subject:`Μηνιαία υπενθύμιση επικοινωνίας – ${student.name}`,
+    body:`Δεν έχει δοθεί συγκεκριμένη περίοδος ενδιαφέροντος. Να επικοινωνήσουμε ξανά με τον/την ${student.name} (${student.phone||student.email||'—'}).`
+  });
+  if(student.email){
+    addNotification({
+      triggerKey:`followup-monthly-candidate:${student.id}:${monthKey}`,
+      type:'candidate_reminder',
+      recipients:[student.name],
+      channel:'email',
+      studentId:student.id, studentName:student.name,
+      subject:`Ενδιαφέρον για εγγραφή – ${state.config.schoolName}`,
+      body:`Γεια σας ${student.name}, θα θέλαμε να μάθουμε αν εξακολουθείτε να ενδιαφέρεστε να εγγραφείτε στο τμήμα ναυαγοσωστικής εκπαίδευσης. Επικοινωνήστε μαζί μας όποτε είστε έτοιμοι/ες.`
+    });
+  }
+  updateStudentLocalOnly(student.id, {'followUp.lastReminderAt': new Date().toISOString()});
+}
+
+function triggerCandidateInfoEmail(student){
+  const info = `Σας ευχαριστούμε για το ενδιαφέρον σας για ${state.config.schoolName}. `
+    +`Σας στέλνουμε πληροφορίες για τα τμήματα (πισίνα/θάλασσα) και τα απαραίτητα δικαιολογητικά: αίτηση, 4 φωτογραφίες, αντίγραφο ταυτότητας και ιατρικές βεβαιώσεις (4, ή 6 αν είστε άνω των 45 ετών). `
+    +`Μπορείτε να έρθετε από κοντά στη σχολή ή να συμμετέχετε online μέσω Zoom στην επόμενη ενημερωτική συνάντηση όπου βγαίνει το πρόγραμμα μαθημάτων.`;
+  if(student.email){
+    addNotification({
+      triggerKey:`info-email:${student.id}`, type:'candidate_info', recipients:[student.name], channel:'email',
+      studentId:student.id, studentName:student.name,
+      subject:`Πληροφορίες τμημάτων & δικαιολογητικά – ${state.config.schoolName}`, body: info
+    });
+  } else {
+    addNotification({
+      triggerKey:`info-email:${student.id}`, type:'candidate_info', recipients:['Γραφείο'], channel:'both',
+      studentId:student.id, studentName:student.name,
+      subject:`Να δοθούν πληροφορίες τηλεφωνικά – ${student.name}`,
+      body:`Δεν υπάρχει email για τον/την ${student.name}. Να δοθούν τηλεφωνικά: ${info}`
+    });
+  }
+  updateStudentLocalOnly(student.id, {infoEmailSent:true});
+}
+
+function triggerReengageNoInterest(student){
+  addNotification({
+    triggerKey:null, type:'reengage_no_interest', recipients:['Γραφείο'], channel:'both',
+    studentId:student.id, studentName:student.name,
+    subject:`Πιθανή επανεπικοινωνία – ${student.name}`,
+    body:`Ο/Η ${student.name} είχε πει ότι δεν ενδιαφέρεται πριν από περίπου 6 μήνες. Ίσως αξίζει να ξαναεπικοινωνήσουμε.`
+  });
+  updateStudentLocalOnly(student.id, {'reengage.lastReminderAt': new Date().toISOString()});
+}
+
+function triggerBoardDelay(student){
+  const boardNames = state.profiles.filter(p=>p.isBoard).map(p=>p.name).filter(Boolean);
+  addNotification({
+    triggerKey:null, type:'board_delay', recipients: boardNames.length?boardNames:['Διευθυντής/ντρια'], channel:'both',
+    studentId:student.id, studentName:student.name,
+    subject:`Καθυστέρηση τοποθέτησης – ${student.name}`,
+    body:`Ο/Η ${student.name} θέλει να ενταχθεί αλλά δεν έχει τοποθετηθεί ακόμη σε τμήμα πισίνας/θάλασσας εδώ και ${daysBetween(student.enrollingSince, new Date().toISOString())} ημέρες.`
+  });
+  updateStudentLocalOnly(student.id, {enrollingLastBoardAlertAt: new Date().toISOString()});
+}
+
+function triggerAttendanceStale(student){
+  addNotification({
+    triggerKey:null,
+    type:'attendance_stale',
+    recipients:['Γραφείο'],
+    channel:'both',
+    studentId:student.id, studentName:student.name,
+    subject:`Ενημέρωση παρουσιολογίου – ${student.name}`,
+    body:`Το παρουσιολόγιο του/της ${student.name} δεν έχει ενημερωθεί εδώ και πάνω από 14 ημέρες. Παρακαλώ συμπληρώστε τις ώρες παρακολούθησης.`
+  });
+  updateStudentLocalOnly(student.id, {'training.lastAttendanceReminderAt': new Date().toISOString()});
+}
+
+function checkDueRules(){
+  if(!state.ready) return;
+  state.students.forEach(st=>{
+    if(st.stage==='interested_later'){
+      if(st.followUp.hasDate && st.followUp.date && st.followUp.date <= todayStr()){
+        triggerFollowupDate(st);
+      } else if(!st.followUp.hasDate){
+        const last = st.followUp.lastReminderAt;
+        if(!last || daysBetween(last, new Date().toISOString()) >= 30){
+          triggerMonthlyFollowup(st);
+        }
+      }
+    }
+    if(st.stage==='in_training'){
+      const lu = st.training.lastAttendanceUpdate;
+      const stale = !lu || daysBetween(lu, new Date().toISOString()) > 14;
+      const remindedRecently = st.training.lastAttendanceReminderAt && daysBetween(st.training.lastAttendanceReminderAt, new Date().toISOString()) < 7;
+      if(stale && !remindedRecently){
+        triggerAttendanceStale(st);
+      }
+    }
+    if(st.stage==='no_interest'){
+      const last = st.reengage.lastReminderAt || st.createdAt;
+      if(daysBetween(last, new Date().toISOString()) >= 180){
+        triggerReengageNoInterest(st);
+      }
+    }
+    if(st.stage==='enrolling' && !st.registry.pool && !st.registry.sea && st.enrollingSince){
+      const days = daysBetween(st.enrollingSince, new Date().toISOString());
+      const alertedRecently = st.enrollingLastBoardAlertAt && daysBetween(st.enrollingLastBoardAlertAt, new Date().toISOString()) < 2;
+      if(days >= (state.config.enrollingDelayDays||3) && !alertedRecently){
+        triggerBoardDelay(st);
+      }
+    }
+  });
+}
+let _ruleTimer=null;
+function scheduleRuleCheck(){ clearTimeout(_ruleTimer); _ruleTimer=setTimeout(checkDueRules, 800); }
+function updateStudentLocalOnly(id, patch){
+  const student = getStudent(id);
+  if(!student) return;
+  applyDotPatch(student, patch);
+  Sb.upsertStudent(student);
+}
+// Who did what is enforced server-side (see students_stamp trigger in
+// schema.sql) — the client can no longer spoof updatedBy/createdBy the way
+// the offline dropdown-based version could.
+function updateStudent(id, patch, opts){
+  const student = getStudent(id);
+  if(!student) return Promise.resolve();
+  applyDotPatch(student, patch);
+  render();
+  if(!(opts&&opts.silent)) toast('Αποθηκεύτηκε');
+  return Sb.upsertStudent(student).then(saved=>{ Object.assign(student, saved); render(); return saved; });
+}
+function addStudent(data){
+  const student = newStudent(data);
+  student.id = uid();
+  state.students.push(student);
+  render();
+  toast('Προστέθηκε νέος υποψήφιος/α');
+  return Sb.upsertStudent(student).then(saved=>{ Object.assign(student, saved); render(); return {id: student.id}; });
+}
+async function deleteStudentPermanently(id){
+  const student = getStudent(id);
+  if(!student) return;
+  if(!Sb.isOwner()){ toast('Μόνο ο/η ιδιοκτήτης/τρια μπορεί να διαγράψει οριστικά.'); return; }
+  if(!window.confirm(`Οριστική διαγραφή του/της "${student.name||'(χωρίς όνομα)'}"; Δεν μπορεί να αναιρεθεί.`)) return;
+  try{
+    await Sb.deleteStudent(id, student.name);
+  }catch(e){ return; }
+  const idx = state.students.findIndex(s=>s.id===id);
+  if(idx>=0) state.students.splice(idx,1);
+  if(state.selectedId===id) state.selectedId=null;
+  toast('Ο/Η μαθητής/τρια διαγράφηκε οριστικά');
+  render();
+}
+
+/* ---------------- auth & data loading ---------------- */
+async function init(){
+  Sb.init();
+  const session = await Sb.getSession();
+  if(session){ await enterApp(session); }
+  else { render(); }
+  Sb.client.auth.onAuthStateChange((event, session)=>{
+    if(event==='SIGNED_IN' && !state.ready){ enterApp(session); }
+    if(event==='SIGNED_OUT'){ state.ready=false; state.config=null; Sb.me=null; render(); }
+  });
+}
+async function enterApp(session){
+  try{
+    await Sb.loadMe(session.user.id);
+    await Sb.loadAll();
+    Sb.subscribeRealtime();
+    state.ready = true;
+    render();
+    scheduleRuleCheck();
+  }catch(e){ toast('Σφάλμα φόρτωσης: '+(e&&e.message||'')); }
+}
+
+/* ---------------- rendering ---------------- */
+function render(){
+  const app = document.getElementById('app');
+  if(!state.ready){ app.innerHTML = renderAuthScreen(); attachAuthHandlers(); return; }
+  if(!state.config){ app.innerHTML = `<div class="empty-state" style="min-height:100vh;"><div class="glyph">🌊</div><p class="muted">Φόρτωση…</p></div>`; return; }
+  app.innerHTML = `
+    ${renderTopbar()}
+    <div class="main">
+      ${state.view==='students' ? renderRail() : ''}
+      <div class="content">${renderContent()}</div>
+    </div>
+  `;
+  attachHandlers();
+}
+
+function renderAuthScreen(){
+  return `<div class="empty-state" style="min-height:100vh;">
+    <div class="glyph">🛟</div>
+    <h2>Μητρώο Ναυαγοσωστών</h2>
+    <p class="muted" style="max-width:420px;">Συνδεθείτε με τον προσωπικό σας λογαριασμό. Ο πρώτος λογαριασμός που θα εγγραφεί γίνεται αυτόματα ιδιοκτήτης/τρια.</p>
+    <div class="card" style="max-width:360px; width:100%; text-align:left;">
+      <form id="authForm">
+        <div class="field" style="margin-bottom:10px;"><label>Email</label><input name="email" type="email" required autofocus></div>
+        <div class="field" style="margin-bottom:10px;"><label>Κωδικός</label><input name="password" type="password" required minlength="6"></div>
+        <div class="field" id="nameField" style="margin-bottom:10px; display:none;"><label>Όνομα</label><input name="name" placeholder="π.χ. Ελισάβετ"></div>
+        <p class="hint" id="authError" style="color:var(--critical); display:none;"></p>
+        <div class="row-actions" style="margin-top:6px;">
+          <button type="submit" class="btn btn-coral" id="authSubmitBtn">Σύνδεση</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="authToggleBtn">Δεν έχω λογαριασμό</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+
+function attachAuthHandlers(){
+  let mode = 'signin';
+  const form = document.getElementById('authForm');
+  const nameField = document.getElementById('nameField');
+  const toggleBtn = document.getElementById('authToggleBtn');
+  const submitBtn = document.getElementById('authSubmitBtn');
+  const errEl = document.getElementById('authError');
+  toggleBtn.addEventListener('click', ()=>{
+    mode = mode==='signin' ? 'signup' : 'signin';
+    nameField.style.display = mode==='signup' ? '' : 'none';
+    submitBtn.textContent = mode==='signup' ? 'Εγγραφή' : 'Σύνδεση';
+    toggleBtn.textContent = mode==='signup' ? 'Έχω ήδη λογαριασμό' : 'Δεν έχω λογαριασμό';
+  });
+  form.addEventListener('submit', async e=>{
+    e.preventDefault();
+    errEl.style.display='none';
+    const fd = new FormData(form);
+    const email = fd.get('email'), password = fd.get('password'), name = fd.get('name');
+    submitBtn.disabled = true;
+    try{
+      if(mode==='signup'){
+        const data = await Sb.signUp(email, password, name||email.split('@')[0]);
+        if(data.session){ await enterApp(data.session); }
+        else { errEl.textContent = 'Ελέγξτε το email σας για επιβεβαίωση, μετά συνδεθείτε.'; errEl.style.display=''; }
+      } else {
+        const data = await Sb.signIn(email, password);
+        await enterApp(data.session);
+      }
+    }catch(err){
+      errEl.textContent = err.message || 'Κάτι πήγε στραβά.';
+      errEl.style.display='';
+    }
+    submitBtn.disabled = false;
+  });
+}
+
+function pendingCount(){ return state.notifications.filter(n=>n.status==='pending').length; }
+
+function renderTopbar(){
+  const counts = {};
+  STAGES.forEach(s=>counts[s.key]=0);
+  state.students.forEach(s=>{ counts[s.stage]=(counts[s.stage]||0)+1; });
+  return `
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">🛟</div>
+      <div class="brand-name">${escapeHtml(state.config.schoolName||'Σχολή Ναυαγοσωστών')}</div>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab ${state.view==='students'?'active':''}" data-view="students">Υποψήφιοι &amp; Μαθητές</button>
+      <button class="nav-tab ${state.view==='notifications'?'active':''}" data-view="notifications">Ειδοποιήσεις</button>
+      <button class="nav-tab ${state.view==='settings'?'active':''}" data-view="settings">Ρυθμίσεις</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="stat-pill" title="Σε εκπαίδευση"><b>${counts.in_training||0}</b> σε εκπαίδευση</div>
+    <div class="stat-pill" title="Ενδιαφέρεται αργότερα"><b>${counts.interested_later||0}</b> προς follow-up</div>
+    <button class="iconbtn" id="refreshBtn" title="Χειροκίνητη ανανέωση">⟳</button>
+    <button class="bell-btn" id="bellBtn" title="Ειδοποιήσεις">🔔${pendingCount()?`<span class="bell-badge">${pendingCount()}</span>`:''}</button>
+    <div class="stat-pill" title="Συνδεδεμένος/η">${escapeHtml(Sb.me?Sb.me.name:'')}${Sb.isOwner()?' · ιδιοκτήτης/τρια':''}</div>
+    <button class="btn btn-ghost btn-sm" id="signOutBtn">Αποσύνδεση</button>
+    <button class="btn btn-coral" id="newStudentBtn">+ Νέος Υποψήφιος</button>
+  </div>`;
+}
+
+function renderRail(){
+  const q = state.search.trim().toLowerCase();
+  let list = state.students.slice().sort((a,b)=> (b.updatedAt||'').localeCompare(a.updatedAt||''));
+  if(state.stageFilter!=='all') list = list.filter(s=>s.stage===state.stageFilter);
+  if(state.trackFilter==='pool') list = list.filter(s=>s.registry.pool);
+  if(state.trackFilter==='sea') list = list.filter(s=>s.registry.sea);
+  if(q) list = list.filter(s=> (s.name||'').toLowerCase().includes(q) || (s.phone||'').includes(q) || (s.email||'').toLowerCase().includes(q));
+  const counts = {};
+  STAGES.forEach(s=>counts[s.key]=0);
+  state.students.forEach(s=>{ counts[s.stage]=(counts[s.stage]||0)+1; });
+  const poolCount = state.students.filter(s=>s.registry.pool).length;
+  const seaCount = state.students.filter(s=>s.registry.sea).length;
+
+  return `
+  <div class="rail">
+    <div class="search-box"><input id="searchInput" placeholder="Αναζήτηση ονόματος, τηλεφώνου, email…" value="${escapeHtml(state.search)}"></div>
+    <div class="chip-row">
+      <button class="chip track-chip ${state.trackFilter==='all'?'active':''}" data-track="all">Όλα τα προγράμματα</button>
+      <button class="chip track-chip ${state.trackFilter==='pool'?'active':''}" data-track="pool">Πισίνα <span class="n">${poolCount}</span></button>
+      <button class="chip track-chip ${state.trackFilter==='sea'?'active':''}" data-track="sea">Θάλασσα <span class="n">${seaCount}</span></button>
+    </div>
+    <div class="chip-row">
+      <button class="chip filter-chip ${state.stageFilter==='all'?'active':''}" data-stage="all">Όλοι <span class="n">${state.students.length}</span></button>
+      ${STAGES.map(s=>`<button class="chip filter-chip ${state.stageFilter===s.key?'active':''}" data-stage="${s.key}">${s.label} <span class="n">${counts[s.key]||0}</span></button>`).join('')}
+    </div>
+    <ul class="student-list">
+      ${list.length? list.map(s=>renderStudentRow(s)).join('') : `<div class="muted" style="padding:14px 4px; font-size:12.5px;">Δεν βρέθηκαν αποτελέσματα.</div>`}
+    </ul>
+  </div>`;
+}
+
+function renderStudentRow(s){
+  const info = stageInfo(s.stage);
+  const alerts = computeAlerts(s);
+  const worst = alerts.some(a=>a.level==='critical') ? 'critical' : (alerts.some(a=>a.level==='warning')?'':'');
+  return `
+  <li>
+    <button class="student-row ${state.selectedId===s.id?'active':''}" data-select="${s.id}">
+      <div class="avatar">${escapeHtml(initials(s.name))}</div>
+      <div class="meta">
+        <div class="name">${escapeHtml(s.name||'(χωρίς όνομα)')}</div>
+        <div class="sub"><span class="badge badge-${info.badge}">${info.label}</span></div>
+      </div>
+      ${alerts.length? `<span class="alert-dot ${worst}" title="${escapeHtml(alerts.map(a=>a.text).join(' · '))}"></span>` : ''}
+    </button>
+  </li>`;
+}
+
+function renderContent(){
+  if(state.view==='notifications') return renderNotificationsView();
+  if(state.view==='settings') return renderSettingsView();
+  const s = state.students.find(x=>x.id===state.selectedId);
+  if(!s){
+    return `<div class="empty-state">
+      <div class="glyph">🏊</div>
+      <h2>Ξεκινήστε εδώ</h2>
+      <p class="muted" style="max-width:420px;">Επιλέξτε έναν υποψήφιο/μαθητή από τη λίστα αριστερά, ή πατήστε «+ Νέος Υποψήφιος» για να καταχωρήσετε μια νέα επικοινωνία (email, τηλέφωνο, social media ή επίσκεψη στο γραφείο).</p>
+    </div>`;
+  }
+  return renderStudentDetail(s);
+}
+
+function renderStudentDetail(s){
+  const info = stageInfo(s.stage);
+  const alerts = computeAlerts(s);
+  const tabs = [
+    ['contact','Επαφή &amp; Στάδιο'],
+    ['registry','Εγγραφή &amp; Μητρώο'],
+    ['payment','Πληρωμές'],
+    ['documents','Δικαιολογητικά'],
+    ['training','Εκπαίδευση'],
+    ['certificate','Πιστοποιητικό'],
+    ['history','Ιστορικό'],
+  ];
+  return `
+  <div class="detail-header">
+    <div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <h2>${escapeHtml(s.name||'(χωρίς όνομα)')}</h2>
+        <span class="badge badge-${info.badge}">${info.label}</span>
+      </div>
+      <div class="muted" style="margin-top:4px; font-size:12.5px;">${escapeHtml(s.phone||'—')} · ${escapeHtml(s.email||'—')} · ενημερώθηκε ${fmtDateTime(s.updatedAt)}${profileName(s.updatedBy)? ' από '+escapeHtml(profileName(s.updatedBy)):''}${profileName(s.createdBy)? ' · καταχωρήθηκε από '+escapeHtml(profileName(s.createdBy)):''}</div>
+    </div>
+    <div class="row-actions">
+      <select class="stage-select" data-id="${s.id}">
+        ${STAGES.map(st=>`<option value="${st.key}" ${s.stage===st.key?'selected':''}>${st.label}</option>`).join('')}
+      </select>
+    </div>
+  </div>
+  ${alerts.length? `<div class="banner"><span>⚑</span><span>${escapeHtml(alerts.map(a=>a.text).join(' · '))}</span></div>` : ''}
+  <div class="detail-tabs">
+    ${tabs.map(([k,l])=>`<button class="detail-tab ${state.detailTab===k?'active':''}" data-dtab="${k}">${l}</button>`).join('')}
+  </div>
+  <div class="card">${renderDetailTab(s)}</div>
+  `;
+}
+
+function renderDetailTab(s){
+  switch(state.detailTab){
+    case 'contact': return tabContact(s);
+    case 'registry': return tabRegistry(s);
+    case 'payment': return tabPayment(s);
+    case 'documents': return tabDocuments(s);
+    case 'training': return tabTraining(s);
+    case 'certificate': return tabCertificate(s);
+    case 'history': return tabHistory(s);
+    default: return '';
+  }
+}
+
+function tabContact(s){
+  return `
+  <form id="contactForm" data-id="${s.id}">
+    <div class="section-title">Στοιχεία επικοινωνίας</div>
+    <div class="grid3">
+      <div class="field"><label>Ονοματεπώνυμο</label><input name="name" value="${escapeHtml(s.name)}" required></div>
+      <div class="field"><label>Τηλέφωνο</label><input name="phone" value="${escapeHtml(s.phone)}"></div>
+      <div class="field"><label>Email</label><input name="email" type="email" value="${escapeHtml(s.email)}"></div>
+    </div>
+    <div class="grid3" style="margin-top:12px;">
+      <div class="field"><label>Πηγή ενδιαφέροντος</label>
+        <select name="source">${SOURCES.map(o=>`<option value="${o.key}" ${s.source===o.key?'selected':''}>${o.label}</option>`).join('')}</select>
+      </div>
+      <div class="field"><label>Ηλικία</label><input name="age" type="number" min="10" max="99" value="${s.age??''}"></div>
+      <div class="field"><label>Ημ. πρώτης επαφής</label><input value="${fmtDate(s.createdAt)}" disabled></div>
+    </div>
+    <div class="field" style="margin-top:12px;"><label>Σημειώσεις επικοινωνίας</label><textarea name="stageNote" rows="2">${escapeHtml(s.stageNote)}</textarea></div>
+    <p class="hint">${s.infoEmailSent? '✓ Έχουν σταλεί πληροφορίες τμημάτων &amp; δικαιολογητικών.' : 'Θα σταλούν αυτόματα πληροφορίες τμημάτων όταν το στάδιο γίνει «Σε επικοινωνία» ή «Θέλει να ενταχθεί».'}</p>
+    ${s.stage==='no_interest' ? `<p class="hint">Παραμένει στη λίστα μελλοντικής επικοινωνίας — θα υπενθυμιστεί σε εμάς μετά από περίπου 6 μήνες.</p>` : ''}
+
+    ${s.stage==='interested_later' ? `
+    <div class="section-title" style="margin-top:18px;">Ενδιαφέρεται αργότερα</div>
+    <div class="grid2">
+      <div class="field">
+        <label><input type="checkbox" name="hasDate" ${s.followUp.hasDate?'checked':''}> Έδωσε συγκεκριμένη περίοδο</label>
+      </div>
+      <div class="field"><label>Ημερομηνία επανεπικοινωνίας</label><input type="date" name="followUpDate" value="${s.followUp.date||''}" ${!s.followUp.hasDate?'disabled':''}></div>
+    </div>
+    <p class="hint">Αν δεν δοθεί ημερομηνία, θα στέλνεται αυτόματα μηνιαία υπενθύμιση σε εμάς και email υπενθύμισης στον υποψήφιο.</p>
+    ` : ''}
+
+    <div class="field" style="margin-top:14px;"><label>Γενικές σημειώσεις</label><textarea name="notes" rows="3">${escapeHtml(s.notes)}</textarea></div>
+    <div class="modal-actions"><button class="btn btn-primary" type="submit">Αποθήκευση</button></div>
+  </form>`;
+}
+
+function tabRegistry(s){
+  const deps = state.departments||[];
+  const poolDeps = deps.filter(d=>d.type==='pool');
+  const seaDeps = deps.filter(d=>d.type==='sea');
+  const poolDupe = s.registry.pool && state.students.some(o=>o.id!==s.id && o.registry.pool && o.registry.pool.number===s.registry.pool.number && s.registry.pool.number);
+  const seaDupe = s.registry.sea && state.students.some(o=>o.id!==s.id && o.registry.sea && o.registry.sea.number===s.registry.sea.number && s.registry.sea.number);
+  return `
+  <form id="registryForm" data-id="${s.id}">
+    <div class="section-title">Μητρώο πισίνας</div>
+    <div class="grid3">
+      <div class="field"><label><input type="checkbox" name="poolEnabled" ${s.registry.pool?'checked':''}> Ένταξη σε τμήμα πισίνας</label></div>
+      <div class="field"><label>Αριθμός μητρώου (όπως στο βιβλίο μητρώου)</label><input name="poolNumber" value="${s.registry.pool?escapeHtml(s.registry.pool.number):''}" ${!s.registry.pool?'disabled':''}></div>
+      <div class="field"><label>Τμήμα</label>
+        <select name="poolDept" ${!s.registry.pool?'disabled':''}>
+          <option value="">—</option>
+          ${poolDeps.map(d=>`<option value="${d.id}" ${s.registry.pool&&s.registry.pool.departmentId===d.id?'selected':''}>${escapeHtml(d.name)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${poolDupe? `<p class="hint" style="color:var(--critical);">⚠ Ο αριθμός μητρώου πισίνας χρησιμοποιείται ήδη από άλλον/η μαθητή/τρια.</p>`:''}
+
+    <div class="section-title" style="margin-top:20px;">Μητρώο θάλασσας</div>
+    <div class="grid3">
+      <div class="field"><label><input type="checkbox" name="seaEnabled" ${s.registry.sea?'checked':''}> Ένταξη σε τμήμα θάλασσας</label></div>
+      <div class="field"><label>Αριθμός μητρώου (όπως στο βιβλίο μητρώου)</label><input name="seaNumber" value="${s.registry.sea?escapeHtml(s.registry.sea.number):''}" ${!s.registry.sea?'disabled':''}></div>
+      <div class="field"><label>Τμήμα</label>
+        <select name="seaDept" ${!s.registry.sea?'disabled':''}>
+          <option value="">—</option>
+          ${seaDeps.map(d=>`<option value="${d.id}" ${s.registry.sea&&s.registry.sea.departmentId===d.id?'selected':''}>${escapeHtml(d.name)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${seaDupe? `<p class="hint" style="color:var(--critical);">⚠ Ο αριθμός μητρώου θάλασσας χρησιμοποιείται ήδη από άλλον/η μαθητή/τρια.</p>`:''}
+    <p class="hint">Η ένταξη σε μητρώο θάλασσας στέλνει αυτόματα ειδοποίηση στην Ευμορφία για το ταχύπλοο.</p>
+    <div class="modal-actions"><button class="btn btn-primary" type="submit">Αποθήκευση</button></div>
+  </form>`;
+}
+
+function tabPayment(s){
+  const p = s.payment;
+  const paidSum = (p.payments||[]).reduce((a,x)=>a+(Number(x.amount)||0),0);
+  const remaining = p.totalAmount!=null ? Math.max(0, p.totalAmount - paidSum) : null;
+  return `
+  <form id="paymentForm" data-id="${s.id}">
+    <div class="section-title">Ποσό εξόφλησης</div>
+    <div class="grid3">
+      <div class="field"><label>Συνολικό ποσό (€)</label><input name="totalAmount" type="number" min="0" step="0.01" value="${p.totalAmount??''}"></div>
+      <div class="field"><label><input type="checkbox" name="directorApproved" ${p.directorApproved?'checked':''}> Εγκρίθηκε από τον Διευθυντή</label></div>
+      <div class="field"><label>Ενέκρινε</label><input name="approvedBy" value="${escapeHtml(p.approvedBy)}" placeholder="Όνομα"></div>
+    </div>
+    <div class="grid3" style="margin-top:12px;">
+      <div class="field"><label>Τρόπος πληρωμής</label>
+        <select name="planType">
+          <option value="single" ${p.planType==='single'?'selected':''}>Εφάπαξ</option>
+          <option value="installments" ${p.planType==='installments'?'selected':''}>Σε δόσεις</option>
+        </select>
+      </div>
+      <div class="field"><label>Παραστατικό</label>
+        <select name="receiptType">
+          <option value="receipt" ${p.receiptType==='receipt'?'selected':''}>Απόδειξη</option>
+          <option value="invoice" ${p.receiptType==='invoice'?'selected':''}>Τιμολόγιο</option>
+        </select>
+      </div>
+      <div class="field"><label>ΑΦΜ ${p.receiptType==='invoice'?'(υποχρεωτικό)':''}</label><input name="afm" value="${escapeHtml(p.afm)}" ${p.receiptType==='invoice'?'required':''}></div>
+    </div>
+    <div class="field" style="margin-top:12px;">
+      <label><input type="checkbox" name="depositApprovedLower" ${p.depositApprovedLower?'checked':''}> Έγκριση διευθυντή για μειωμένη προκαταβολή (${state.config.minDepositWithApproval}€ αντί ${state.config.minDeposit}€)</label>
+    </div>
+    <p class="hint">Ελάχιστη προκαταβολή: ${fmtMoney(depositMinimum(s))}${remaining!=null? ` · Υπόλοιπο: ${fmtMoney(remaining)}`:''}</p>
+    <div class="modal-actions"><button class="btn btn-primary" type="submit">Αποθήκευση στοιχείων πληρωμής</button></div>
+  </form>
+
+  ${p.planType==='installments' ? renderInstallments(s) : ''}
+
+  <div class="section-title" style="margin-top:22px;">Καταχώρηση πληρωμής</div>
+  <form id="logPaymentForm" data-id="${s.id}" class="grid3" style="align-items:end;">
+    <div class="field"><label>Ποσό (€)</label><input name="amount" type="number" min="0" step="0.01" required></div>
+    <div class="field"><label>Ημερομηνία</label><input name="date" type="date" value="${todayStr()}"></div>
+    <div class="field"><label>Σημείωση</label><input name="note" placeholder="π.χ. 1η δόση"></div>
+    <div style="grid-column:1/-1;"><button class="btn btn-primary" type="submit">Καταχώρηση πληρωμής (ειδοποιεί Ελισάβετ &amp; Γραφείο)</button></div>
+  </form>
+  <div class="table-wrap" style="margin-top:14px;">
+    <table class="ntf-table">
+      <thead><tr><th>Ημερομηνία</th><th>Ποσό</th><th>Σημείωση</th><th>Καταχωρήθηκε από</th></tr></thead>
+      <tbody>
+        ${(p.payments||[]).length? p.payments.slice().reverse().map(x=>`<tr><td>${fmtDate(x.date)}</td><td class="tabular">${fmtMoney(x.amount)}</td><td>${escapeHtml(x.note||'—')}</td><td>${escapeHtml(x.loggedBy||'—')}</td></tr>`).join('') : `<tr><td colspan="4" class="muted">Καμία πληρωμή ακόμη.</td></tr>`}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderInstallments(s){
+  const rows = s.payment.installments||[];
+  return `
+  <div class="section-title" style="margin-top:20px;">Δόσεις</div>
+  <div id="installmentsList">
+    ${rows.map((r,i)=>`
+      <div class="grid3" data-inst-row="${r.id}" style="margin-bottom:8px; align-items:end;">
+        <div class="field"><label>Ποσό</label><input type="number" step="0.01" class="inst-amount" value="${r.amount}"></div>
+        <div class="field"><label>Ημ/νία λήξης</label><input type="date" class="inst-date" value="${r.dueDate||''}"></div>
+        <div class="field" style="flex-direction:row; align-items:center; gap:8px;">
+          <label style="flex:1;"><input type="checkbox" class="inst-paid" ${r.paid?'checked':''}> Εξοφλήθηκε</label>
+          <button type="button" class="iconbtn" data-remove-inst="${r.id}">✕</button>
+        </div>
+      </div>`).join('')}
+  </div>
+  <div class="row-actions">
+    <button type="button" class="btn btn-ghost btn-sm" id="addInstallmentBtn" data-id="${s.id}">+ Προσθήκη δόσης</button>
+    <button type="button" class="btn btn-primary btn-sm" id="saveInstallmentsBtn" data-id="${s.id}">Αποθήκευση δόσεων</button>
+  </div>`;
+}
+
+function tabDocuments(s){
+  const d = s.documents;
+  const requiredMedical = s.age && s.age>45 ? 6 : (d.medicalRequired||4);
+  return `
+  <form id="documentsForm" data-id="${s.id}">
+    <div class="section-title">Δικαιολογητικά</div>
+    <div class="checklist-row"><input type="checkbox" name="application" id="doc-application" ${d.application?'checked':''}><label for="doc-application">Αίτηση (έντυπη/ηλεκτρονική)</label></div>
+    <div class="checklist-row"><input type="checkbox" name="photos" id="doc-photos" ${d.photos?'checked':''}><label for="doc-photos">4 φωτογραφίες</label></div>
+    <div class="checklist-row"><input type="checkbox" name="idCopy" id="doc-idCopy" ${d.idCopy?'checked':''}><label for="doc-idCopy">Αντίγραφο ταυτότητας</label></div>
+    <div class="checklist-row">
+      <label style="flex:1;">Ιατρικές βεβαιώσεις (απαιτούνται ${requiredMedical}${s.age&&s.age>45?' — άνω των 45 ετών':''})</label>
+      <input type="number" name="medicalProvided" min="0" max="6" style="width:70px;" value="${d.medicalProvided||0}">
+    </div>
+    <input type="hidden" name="medicalRequired" value="${requiredMedical}">
+    <div class="modal-actions"><button class="btn btn-primary" type="submit">Αποθήκευση</button></div>
+  </form>`;
+}
+
+function tabTraining(s){
+  const t = s.training;
+  const abs = computeAbsencePct(s);
+  return `
+  <form id="trainingForm" data-id="${s.id}">
+    <div class="section-title">Παρουσιολόγιο &amp; Επιδόσεις</div>
+    <div class="grid3">
+      ${s.registry.pool? `<div class="field"><label>Ώρες πισίνας (από ${POOL_TOTAL_HOURS})</label><input type="number" name="poolHours" min="0" max="${POOL_TOTAL_HOURS}" value="${t.poolHours||0}"></div>`:''}
+      ${s.registry.sea? `<div class="field"><label>Ώρες θάλασσας (από ${SEA_TOTAL_HOURS})</label><input type="number" name="seaHours" min="0" max="${SEA_TOTAL_HOURS}" value="${t.seaHours||0}"></div>`:''}
+      <div class="field"><label><input type="checkbox" name="performanceApproved" ${t.performanceApproved?'checked':''}> Επιδόσεις εγκεκριμένες από εκπαιδεύτρια</label></div>
+    </div>
+    <p class="hint">
+      ${s.registry.pool? `Απουσίες πισίνας: ${abs.pool}% ${abs.pool>20?'⚠ υπερβαίνει το 20%':''}<br>`:''}
+      ${s.registry.sea? `Απουσίες θάλασσας: ${abs.sea}% ${abs.sea>20?'⚠ υπερβαίνει το 20%':''}`:''}
+    </p>
+    <p class="hint">Τελευταία ενημέρωση παρουσιολογίου: ${fmtDateTime(t.lastAttendanceUpdate)}</p>
+    <div class="modal-actions"><button class="btn btn-primary" type="submit">Αποθήκευση παρουσιών</button></div>
+  </form>`;
+}
+
+function tabCertificate(s){
+  const e = computeEligibility(s);
+  const row = (ok,label)=>`<div class="eligibility-row"><span class="eligibility-icon ${ok?'ok':'bad'}">${ok?'✓':'✕'}</span><span>${label}</span></div>`;
+  return `
+  <div class="section-title">Προϋποθέσεις πιστοποιητικού</div>
+  ${row(e.absOk,'Απουσίες έως 20% των ωρών')}
+  ${row(e.paid,'Πλήρης εξόφληση')}
+  ${row(e.medicalOk,'Πλήρεις ιατρικές βεβαιώσεις')}
+  ${row(e.docsOk,'Πλήρη δικαιολογητικά (αίτηση, φωτογραφίες, ταυτότητα, ιατρικές)')}
+  ${row(e.perfOk,'Εγκεκριμένες επιδόσεις από εκπαιδεύτρια')}
+  <div class="banner" style="background:${e.all?'var(--success-soft)':'var(--critical-soft)'}; color:${e.all?'var(--success)':'var(--critical)'}; border-color:${e.all?'var(--success)':'var(--critical)'};">
+    ${e.all? '✓ Πληρούνται όλες οι προϋποθέσεις — μπορεί να λάβει πιστοποιητικό.' : 'Δεν πληρούνται ακόμη όλες οι προϋποθέσεις.'}
+  </div>`;
+}
+
+function tabHistory(s){
+  const list = state.notifications.filter(n=>n.studentId===s.id);
+  return `
+  <div class="section-title">Ειδοποιήσεις σχετικές με τον/την ${escapeHtml(s.name)}</div>
+  ${list.length? renderNotifTable(list) : `<p class="muted">Καμία ειδοποίηση ακόμη.</p>`}
+  ${Sb.isOwner()? `
+  <div style="margin-top:24px; padding-top:16px; border-top:1px solid var(--border);">
+    <div class="section-title" style="color:var(--critical, #c0392b);">Οριστική διαγραφή</div>
+    <p class="hint" style="margin-bottom:10px;">Διαγράφει μόνιμα τον/την υποψήφιο/α και όλα τα στοιχεία του/της. Δεν αναιρείται.</p>
+    <button class="btn btn-ghost btn-sm" style="border-color:var(--critical,#c0392b); color:var(--critical,#c0392b);" id="deleteStudentBtn" data-id="${s.id}">🗑 Διαγραφή μαθητή/τριας</button>
+  </div>` : ''}`;
+}
+
+/* ---------------- notifications view ---------------- */
+function renderNotificationsView(){
+  const filters = [['pending','Εκκρεμείς'],['sent','Απεσταλμένες'],['all','Όλες']];
+  let list = state.notifications;
+  if(state.notifFilter!=='all') list = list.filter(n=>n.status===state.notifFilter);
+  return `
+  <h2 style="margin-bottom:4px;">Ειδοποιήσεις</h2>
+  <p class="muted" style="margin-bottom:16px;">Αυτόματα καταγεγραμμένες ειδοποιήσεις προς αποστολή με email/Slack. Αντιγράψτε το κείμενο και στείλτε το, έπειτα σημειώστε το ως απεσταλμένο.</p>
+  <div class="chip-row" style="margin-bottom:14px;">
+    ${filters.map(([k,l])=>`<button class="chip notif-filter ${state.notifFilter===k?'active':''}" data-nf="${k}">${l} <span class="n">${k==='all'?state.notifications.length:state.notifications.filter(n=>n.status===k).length}</span></button>`).join('')}
+  </div>
+  <div class="card">${list.length? renderNotifTable(list) : `<p class="muted">Δεν υπάρχουν ειδοποιήσεις σε αυτή την κατηγορία.</p>`}</div>`;
+}
+
+function renderNotifTable(list){
+  return `<div class="table-wrap"><table class="ntf-table">
+    <thead><tr><th>Ημερομηνία</th><th>Τύπος</th><th>Παραλήπτες</th><th>Μήνυμα</th><th>Κατάσταση</th><th></th></tr></thead>
+    <tbody>
+    ${list.map(n=>`
+      <tr>
+        <td>${fmtDate(n.createdAt)}${n.dueDate?`<br><span class="muted">λήξη ${fmtDate(n.dueDate)}</span>`:''}</td>
+        <td>${escapeHtml(notifTypeLabel(n.type))}</td>
+        <td>${(n.recipients||[]).map(r=>`<span class="badge badge-neutral">${escapeHtml(r)}</span>`).join(' ')}</td>
+        <td><div class="msg-preview"><b>${escapeHtml(n.subject||'')}</b><br>${escapeHtml(n.body||'')}</div></td>
+        <td>${n.status==='sent'? `<span class="badge badge-success">Εστάλη</span><br><span class="muted" style="font-size:11px;">${escapeHtml(n.sentBy||'')} · ${fmtDate(n.sentAt)}</span>` : `<span class="badge badge-warning">Εκκρεμεί</span>`}</td>
+        <td>
+          <div class="row-actions">
+            <button class="btn btn-ghost btn-sm" data-copy="${n.id}">Αντιγραφή</button>
+            ${n.status!=='sent'? `<button class="btn btn-primary btn-sm" data-mark-sent="${n.id}">Εστάλη</button>` : ''}
+          </div>
+        </td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+function notifTypeLabel(t){
+  return ({
+    sea_registry:'Ταχύπλοο (θάλασσα)', payment:'Πληρωμή', exam_materials:'Εξεταστικό υλικό',
+    followup:'Επανεπικοινωνία', followup_monthly:'Μηνιαία υπενθύμιση', candidate_reminder:'Email σε υποψήφιο',
+    attendance_stale:'Παρουσιολόγιο', candidate_info:'Πληροφορίες σε υποψήφιο',
+    reengage_no_interest:'Επανεπικοινωνία (6 μήνες)', board_delay:'Καθυστέρηση τοποθέτησης (board)'
+  })[t] || t || '—';
+}
+
+/* ---------------- settings view ---------------- */
+function renderSettingsView(){
+  const c = state.config;
+  return `
+  <h2 style="margin-bottom:16px;">Ρυθμίσεις</h2>
+  <div class="card" style="margin-bottom:16px;">
+    <div class="section-title">Γενικά</div>
+    <form id="generalSettingsForm" class="grid3">
+      <div class="field"><label>Όνομα σχολής</label><input name="schoolName" value="${escapeHtml(c.schoolName)}"></div>
+      <div class="field"><label>Ελάχιστη προκαταβολή (€)</label><input type="number" name="minDeposit" value="${c.minDeposit}"></div>
+      <div class="field"><label>Ελάχιστη με έγκριση διευθυντή (€)</label><input type="number" name="minDepositWithApproval" value="${c.minDepositWithApproval}"></div>
+      <div class="field"><label>Ειδοποίηση board μετά από (ημέρες χωρίς τοποθέτηση σε τμήμα)</label><input type="number" name="enrollingDelayDays" value="${c.enrollingDelayDays||3}"></div>
+      <div style="grid-column:1/-1;"><button class="btn btn-primary btn-sm" type="submit">Αποθήκευση</button></div>
+    </form>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="section-title">Ομάδα &amp; παραλήπτες ειδοποιήσεων</div>
+    <p class="hint" style="margin-top:-6px; margin-bottom:10px;">
+      Κάθε άτομο δημιουργεί τον δικό του λογαριασμό (οθόνη σύνδεσης, «Δεν έχω λογαριασμό»). Εδώ φαίνονται όσοι έχουν ήδη εγγραφεί.
+      Τα μέλη με «Board» ειδοποιούνται στο Slack/mail κάθε 2 ημέρες όταν καθυστερεί η τοποθέτηση κάποιου σε τμήμα.
+      ${Sb.isOwner()? '' : '<br>Μόνο ο/η ιδιοκτήτης/τρια μπορεί να αλλάξει ρόλο ή Board.'}
+    </p>
+    <div id="staffList">
+      ${state.profiles.map(st=>`
+        <div class="staff-card" data-profile-id="${st.id}">
+          <div>${escapeHtml(st.name)}${st.role==='owner'?' <span class="badge badge-accent">ιδιοκτήτης/τρια</span>':''}</div>
+          <div class="muted" style="font-size:12px;">${escapeHtml(st.email)}</div>
+          <label style="font-size:11.5px; display:flex; align-items:center; gap:5px; white-space:nowrap;">
+            <input type="checkbox" class="st-board" ${st.isBoard?'checked':''} ${Sb.isOwner()?'':'disabled'}> Board
+          </label>
+        </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Τμήματα</div>
+    <div id="depList">
+      ${state.departments.map(d=>`
+        <div class="dep-card" data-dep-id="${d.id}">
+          <input class="dep-name" value="${escapeHtml(d.name)}" placeholder="Όνομα τμήματος">
+          <select class="dep-type">
+            <option value="pool" ${d.type==='pool'?'selected':''}>Πισίνα</option>
+            <option value="sea" ${d.type==='sea'?'selected':''}>Θάλασσα</option>
+          </select>
+          <input type="date" class="dep-start" value="${d.startDate||''}">
+          ${Sb.isOwner()? `<button type="button" class="iconbtn" data-remove-dep="${d.id}">✕</button>` : '<span></span>'}
+        </div>`).join('')}
+    </div>
+    <div class="row-actions" style="margin-top:12px;">
+      <button class="btn btn-ghost btn-sm" id="addDepBtn">+ Προσθήκη τμήματος</button>
+      <button class="btn btn-primary btn-sm" id="saveDepBtn">Αποθήκευση τμημάτων</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="section-title">Ασφάλεια &amp; πρόσβαση</div>
+    <p class="hint" style="margin-top:-6px;">
+      Κάθε άτομο συνδέεται με τον δικό του λογαριασμό — οι καταχωρήσεις καταγράφονται αυτόματα στο όνομά του από τον server, όχι από επιλογή μέσα στην εφαρμογή.
+      Η οριστική διαγραφή μαθητή και η διαγραφή τμήματος επιτρέπονται μόνο στον λογαριασμό-ιδιοκτήτη (${escapeHtml(state.profiles.find(p=>p.role==='owner')?.name||'—')}) — το επιβάλλει η ίδια η βάση δεδομένων, όχι μόνο η οθόνη.
+    </p>
+  </div>`;
+}
+
+/* ---------------- event handlers ---------------- */
+function attachHandlers(){
+  document.querySelectorAll('.nav-tab').forEach(b=>b.addEventListener('click', ()=>{ state.view=b.dataset.view; render(); }));
+  const bell = document.getElementById('bellBtn');
+  if(bell) bell.addEventListener('click', ()=>{ state.view='notifications'; state.notifFilter='pending'; render(); });
+  const newBtn = document.getElementById('newStudentBtn');
+  if(newBtn) newBtn.addEventListener('click', openNewStudentModal);
+  const refreshBtn = document.getElementById('refreshBtn');
+  if(refreshBtn) refreshBtn.addEventListener('click', async ()=>{
+    await Sb.loadAll(); scheduleRuleCheck(); render(); toast('Ανανεώθηκε');
+  });
+  const signOutBtn = document.getElementById('signOutBtn');
+  if(signOutBtn) signOutBtn.addEventListener('click', async ()=>{ await Sb.signOut(); });
+
+  document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click', ()=>{ state.stageFilter=b.dataset.stage; render(); }));
+  document.querySelectorAll('.track-chip').forEach(b=>b.addEventListener('click', ()=>{ state.trackFilter=b.dataset.track; render(); }));
+  const search = document.getElementById('searchInput');
+  if(search){ search.addEventListener('input', e=>{ state.search=e.target.value; renderRailOnly(); }); }
+  document.querySelectorAll('[data-select]').forEach(b=>b.addEventListener('click', ()=>{ state.selectedId=b.dataset.select; state.detailTab='contact'; render(); }));
+  document.querySelectorAll('.detail-tab').forEach(b=>b.addEventListener('click', ()=>{ state.detailTab=b.dataset.dtab; render(); }));
+  const delStudentBtn = document.getElementById('deleteStudentBtn');
+  if(delStudentBtn) delStudentBtn.addEventListener('click', ()=>deleteStudentPermanently(delStudentBtn.dataset.id));
+  document.querySelectorAll('.stage-select').forEach(sel=>sel.addEventListener('change', e=>{
+    const id = sel.dataset.id;
+    const student = state.students.find(x=>x.id===id);
+    const newStage = e.target.value;
+    const oldStage = student.stage;
+    const patch = {stage:newStage};
+    if(newStage==='enrolling' && oldStage!=='enrolling'){ patch.enrollingSince = new Date().toISOString(); }
+    updateStudent(id, patch).then(()=>{
+      if((newStage==='contacted' || newStage==='enrolling') && !student.infoEmailSent){
+        triggerCandidateInfoEmail(student);
+      }
+    });
+  }));
+
+  const cf = document.getElementById('contactForm');
+  if(cf) cf.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(cf);
+    const patch = {
+      name: fd.get('name')||'', phone: fd.get('phone')||'', email: fd.get('email')||'',
+      source: fd.get('source'), age: fd.get('age')?Number(fd.get('age')):null,
+      stageNote: fd.get('stageNote')||'', notes: fd.get('notes')||'',
+      'followUp.hasDate': fd.get('hasDate')==='on',
+      'followUp.date': fd.get('hasDate')==='on' ? (fd.get('followUpDate')||null) : null,
+    };
+    updateStudent(cf.dataset.id, patch);
+  });
+  const hasDateChk = document.querySelector('input[name="hasDate"]');
+  if(hasDateChk) hasDateChk.addEventListener('change', e=>{
+    const dateInput = document.querySelector('input[name="followUpDate"]');
+    if(dateInput) dateInput.disabled = !e.target.checked;
+  });
+
+  const rf = document.getElementById('registryForm');
+  if(rf) rf.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(rf);
+    const id = rf.dataset.id;
+    const student = state.students.find(x=>x.id===id);
+    const wasSeaEmpty = !student.registry.sea;
+    const patch = {};
+    patch.registry = {
+      pool: fd.get('poolEnabled')==='on' ? {number: fd.get('poolNumber')||'', departmentId: fd.get('poolDept')||''} : null,
+      sea: fd.get('seaEnabled')==='on' ? {number: fd.get('seaNumber')||'', departmentId: fd.get('seaDept')||''} : null,
+    };
+    updateStudent(id, patch).then(()=>{
+      const updated = Object.assign({}, student, patch);
+      if(wasSeaEmpty && updated.registry.sea && updated.registry.sea.number){ triggerSeaAssigned(updated); }
+    });
+  });
+  document.querySelectorAll('input[name="poolEnabled"], input[name="seaEnabled"]').forEach(chk=>{
+    chk.addEventListener('change', e=>{
+      const prefix = e.target.name.startsWith('pool')?'pool':'sea';
+      document.querySelector(`[name="${prefix}Number"]`).disabled = !e.target.checked;
+      document.querySelector(`[name="${prefix}Dept"]`).disabled = !e.target.checked;
+    });
+  });
+
+  const pf = document.getElementById('paymentForm');
+  if(pf) pf.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(pf);
+    const patch = {
+      'payment.totalAmount': fd.get('totalAmount')? Number(fd.get('totalAmount')) : null,
+      'payment.directorApproved': fd.get('directorApproved')==='on',
+      'payment.approvedBy': fd.get('approvedBy')||'',
+      'payment.planType': fd.get('planType'),
+      'payment.receiptType': fd.get('receiptType'),
+      'payment.afm': fd.get('afm')||'',
+      'payment.depositApprovedLower': fd.get('depositApprovedLower')==='on',
+    };
+    updateStudent(pf.dataset.id, patch);
+  });
+  const lpf = document.getElementById('logPaymentForm');
+  if(lpf) lpf.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(lpf);
+    const id = lpf.dataset.id;
+    const student = state.students.find(x=>x.id===id);
+    const wasAnyPayment = (student.payment.payments||[]).length>0;
+    const newPayment = {id:uid(), amount:Number(fd.get('amount')), date: fd.get('date')||todayStr(), note: fd.get('note')||'', loggedBy: Sb.me?Sb.me.name:''};
+    const payments = (student.payment.payments||[]).concat([newPayment]);
+    updateStudent(id, {'payment.payments': payments}).then(()=>{
+      triggerPaymentLogged(student, newPayment);
+      const sumBefore = (student.payment.payments||[]).reduce((a,x)=>a+(Number(x.amount)||0),0);
+      const sumAfter = sumBefore + newPayment.amount;
+      if(sumBefore < depositMinimum(student) && sumAfter >= depositMinimum(student)){
+        triggerExamMaterials(student);
+      }
+    });
+  });
+  const addInst = document.getElementById('addInstallmentBtn');
+  if(addInst) addInst.addEventListener('click', ()=>{
+    const student = state.students.find(x=>x.id===addInst.dataset.id);
+    const installments = (student.payment.installments||[]).concat([{id:uid(), amount:0, dueDate:null, paid:false}]);
+    updateStudent(student.id, {'payment.installments': installments}, {silent:true}).then(()=>render());
+  });
+  document.querySelectorAll('[data-remove-inst]').forEach(b=>b.addEventListener('click', ()=>{
+    const s = state.students.find(x=>x.id===document.getElementById('saveInstallmentsBtn').dataset.id);
+    const installments = (s.payment.installments||[]).filter(r=>r.id!==b.dataset.removeInst);
+    updateStudent(s.id, {'payment.installments': installments}, {silent:true}).then(()=>render());
+  }));
+  const saveInst = document.getElementById('saveInstallmentsBtn');
+  if(saveInst) saveInst.addEventListener('click', ()=>{
+    const rows = document.querySelectorAll('[data-inst-row]');
+    const installments = Array.from(rows).map(r=>({
+      id: r.dataset.instRow,
+      amount: Number(r.querySelector('.inst-amount').value)||0,
+      dueDate: r.querySelector('.inst-date').value || null,
+      paid: r.querySelector('.inst-paid').checked,
+    }));
+    updateStudent(saveInst.dataset.id, {'payment.installments': installments});
+  });
+
+  const df = document.getElementById('documentsForm');
+  if(df) df.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(df);
+    updateStudent(df.dataset.id, {
+      'documents.application': fd.get('application')==='on',
+      'documents.photos': fd.get('photos')==='on',
+      'documents.idCopy': fd.get('idCopy')==='on',
+      'documents.medicalProvided': Number(fd.get('medicalProvided'))||0,
+      'documents.medicalRequired': Number(fd.get('medicalRequired'))||4,
+    });
+  });
+
+  const tf = document.getElementById('trainingForm');
+  if(tf) tf.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(tf);
+    const patch = { 'training.performanceApproved': fd.get('performanceApproved')==='on', 'training.lastAttendanceUpdate': new Date().toISOString() };
+    if(fd.has('poolHours')) patch['training.poolHours'] = Number(fd.get('poolHours'))||0;
+    if(fd.has('seaHours')) patch['training.seaHours'] = Number(fd.get('seaHours'))||0;
+    updateStudent(tf.dataset.id, patch);
+  });
+
+  document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click', ()=>{
+    const n = state.notifications.find(x=>x.id===b.dataset.copy);
+    if(!n) return;
+    const text = `${n.subject}\n\n${n.body}`;
+    navigator.clipboard?.writeText(text).then(()=>toast('Αντιγράφηκε στο πρόχειρο')).catch(()=>toast('Δεν ήταν δυνατή η αντιγραφή'));
+  }));
+  document.querySelectorAll('[data-mark-sent]').forEach(b=>b.addEventListener('click', async ()=>{
+    const n = state.notifications.find(x=>x.id===b.dataset.markSent);
+    if(!n) return;
+    n.status='sent'; n.sentAt=new Date().toISOString(); n.sentBy=Sb.me?Sb.me.name:'';
+    render();
+    await Sb.upsertNotification(n); // sent_by/sent_at are re-stamped server-side by trigger
+  }));
+  document.querySelectorAll('.notif-filter').forEach(b=>b.addEventListener('click', ()=>{ state.notifFilter=b.dataset.nf; render(); }));
+
+  const gsf = document.getElementById('generalSettingsForm');
+  if(gsf) gsf.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(gsf);
+    const patch = {
+      school_name: fd.get('schoolName')||'Σχολή Ναυαγοσωστών',
+      min_deposit: Number(fd.get('minDeposit'))||100,
+      min_deposit_with_approval: Number(fd.get('minDepositWithApproval'))||50,
+      enrolling_delay_days: Number(fd.get('enrollingDelayDays'))||3,
+    };
+    Object.assign(state.config, {
+      schoolName: patch.school_name, minDeposit: patch.min_deposit,
+      minDepositWithApproval: patch.min_deposit_with_approval, enrollingDelayDays: patch.enrolling_delay_days,
+    });
+    render();
+    Sb.updateSettings(patch).then(()=>toast('Αποθηκεύτηκε'));
+  });
+  document.querySelectorAll('.st-board').forEach(chk=>chk.addEventListener('change', e=>{
+    const card = e.target.closest('[data-profile-id]');
+    const id = card.dataset.profileId;
+    const p = state.profiles.find(x=>x.id===id);
+    if(p) p.isBoard = e.target.checked;
+    Sb.updateProfile(id, {is_board: e.target.checked}).then(()=>toast('Αποθηκεύτηκε'));
+  }));
+  const addDepBtn = document.getElementById('addDepBtn');
+  if(addDepBtn) addDepBtn.addEventListener('click', async ()=>{
+    const d = await Sb.upsertDepartment({name:'', type:'pool', startDate:null});
+    state.departments.push(d); render();
+  });
+  document.querySelectorAll('[data-remove-dep]').forEach(b=>b.addEventListener('click', async ()=>{
+    if(!window.confirm('Διαγραφή τμήματος;')) return;
+    const dep = state.departments.find(d=>d.id===b.dataset.removeDep);
+    try{ await Sb.deleteDepartment(b.dataset.removeDep, dep&&dep.name); }catch(e){ return; }
+    state.departments = state.departments.filter(d=>d.id!==b.dataset.removeDep);
+    render();
+  }));
+  const saveDepBtn = document.getElementById('saveDepBtn');
+  if(saveDepBtn) saveDepBtn.addEventListener('click', ()=>{
+    const cards = document.querySelectorAll('[data-dep-id]');
+    Promise.all(Array.from(cards).map(c=>Sb.upsertDepartment({
+      id:c.dataset.depId, name:c.querySelector('.dep-name').value, type:c.querySelector('.dep-type').value, startDate:c.querySelector('.dep-start').value||null
+    }))).then(rows=>{ state.departments = rows; toast('Αποθηκεύτηκαν τα τμήματα'); render(); });
+  });
+}
+
+function renderRailOnly(){
+  const railEl = document.querySelector('.rail');
+  if(!railEl) return;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = renderRail();
+  railEl.replaceWith(wrapper.firstElementChild);
+  attachHandlers();
+  document.getElementById('searchInput').focus();
+  document.getElementById('searchInput').setSelectionRange(state.search.length, state.search.length);
+}
+
+/* ---------------- new student modal ---------------- */
+function openNewStudentModal(){
+  const backdrop = document.createElement('div');
+  backdrop.className='modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal">
+      <h3>Νέος Υποψήφιος/α</h3>
+      <form id="newStudentForm">
+        <div class="field" style="margin-bottom:10px;"><label>Ονοματεπώνυμο</label><input name="name" required autofocus></div>
+        <div class="field" style="margin-bottom:10px;"><label>Τηλέφωνο</label><input name="phone"></div>
+        <div class="field" style="margin-bottom:10px;"><label>Email</label><input name="email" type="email"></div>
+        <div class="field"><label>Πηγή ενδιαφέροντος</label>
+          <select name="source">${SOURCES.map(o=>`<option value="${o.key}">${o.label}</option>`).join('')}</select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelNewStudent">Άκυρο</button>
+          <button type="submit" class="btn btn-coral">Δημιουργία</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(backdrop);
+  backdrop.addEventListener('click', e=>{ if(e.target===backdrop) backdrop.remove(); });
+  document.getElementById('cancelNewStudent').addEventListener('click', ()=>backdrop.remove());
+  document.getElementById('newStudentForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    addStudent({ name:fd.get('name'), phone:fd.get('phone')||'', email:fd.get('email')||'', source:fd.get('source'), stage:'lead' }).then(ref=>{
+      if(ref){ state.selectedId = ref.id; state.view='students'; backdrop.remove(); }
+    });
+  });
+}
+
+init();
+</script>
